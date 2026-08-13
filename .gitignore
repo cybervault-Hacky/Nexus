@@ -18,3 +18,12 @@ local.properties
 *.tmp
 *.bak
 *.swp
+
+# Signing keystores
+*.jks
+*.keystore
+keystore.properties
+
+# Environment
+.env
+.env.local
