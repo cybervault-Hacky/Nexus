@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import com.nexus.app.ui.components.GlassSurface
 import com.nexus.app.ui.screens.capsules.CapsuleUiState
 import com.nexus.app.ui.screens.capsules.CapsuleViewModel
