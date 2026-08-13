@@ -38,7 +38,11 @@ fun NexusScaffold() {
         currentRoute == Screen.EnvironmentSources.route ||
         currentRoute == Screen.PrivacySettings.route ||
         currentRoute == Screen.EventDiagnostics.route ||
-        currentRoute == Screen.AutomationSimulator.route
+        currentRoute == Screen.AutomationSimulator.route ||
+        currentRoute == Screen.AutomationTemplates.route ||
+        currentRoute == Screen.AutomationAnalytics.route ||
+        currentRoute == Screen.AutomationSuggestions.route ||
+        currentRoute == Screen.AutomationConflicts.route
 
     val showBottomBar = currentRoute in topLevelRoutes && !isSubScreen
 

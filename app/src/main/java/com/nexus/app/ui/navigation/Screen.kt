@@ -152,6 +152,26 @@ sealed class Screen(
         const val route = "automation_simulator"
     }
 
+    /** Automation templates */
+    data object AutomationTemplates {
+        const val route = "automation_templates"
+    }
+
+    /** Automation analytics */
+    data object AutomationAnalytics {
+        const val route = "automation_analytics"
+    }
+
+    /** Automation suggestions */
+    data object AutomationSuggestions {
+        const val route = "automation_suggestions"
+    }
+
+    /** Automation conflicts */
+    data object AutomationConflicts {
+        const val route = "automation_conflicts"
+    }
+
     companion object {
         /** Ordered list of screens shown in the bottom nav bar. */
         val bottomNavItems = listOf(Home, Contexts, Capsules, Actions, Automations, Settings)

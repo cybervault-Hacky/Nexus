@@ -11,6 +11,8 @@ import androidx.room.PrimaryKey
         Index(value = ["contextId"]),
         Index(value = ["isEnabled"]),
         Index(value = ["triggerType"]),
+        Index(value = ["priority"]),
+        Index(value = ["healthStatus"]),
     ],
 )
 data class AutomationEntity(
@@ -25,4 +27,11 @@ data class AutomationEntity(
     @ColumnInfo(name = "lastTriggeredAt") val lastTriggeredAt: Long?,
     @ColumnInfo(name = "createdAt") val createdAt: Long,
     @ColumnInfo(name = "updatedAt") val updatedAt: Long,
+    // Phase 10 additions
+    @ColumnInfo(name = "priority", defaultValue = "1") val priority: Int = 1, // NORMAL
+    @ColumnInfo(name = "healthStatus", defaultValue = "UNKNOWN") val healthStatus: String = "UNKNOWN",
+    @ColumnInfo(name = "conditionsJson", defaultValue = "") val conditionsJson: String = "",
+    @ColumnInfo(name = "executionCount", defaultValue = "0") val executionCount: Int = 0,
+    @ColumnInfo(name = "failureCount", defaultValue = "0") val failureCount: Int = 0,
+    @ColumnInfo(name = "successCount", defaultValue = "0") val successCount: Int = 0,
 )

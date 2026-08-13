@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 /**
  * The single Room database for NEXUS.
- * Version 7 (Phase 9): adds event_history table.
+ * Version 8 (Phase 10): adds priority, health, conditions, execution counters to automation_rules.
  */
 @Database(
     entities = [
@@ -16,7 +16,7 @@ import androidx.room.RoomDatabase
         AutomationEntity::class, AutomationExecutionEntity::class,
         EventHistoryEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 abstract class NexusDatabase : RoomDatabase() {

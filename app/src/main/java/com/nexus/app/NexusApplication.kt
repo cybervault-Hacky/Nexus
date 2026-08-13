@@ -73,6 +73,9 @@ class NexusApplication : Application() {
     lateinit var capabilityManager: CapabilityManager; private set
     lateinit var geofenceRepository: GeofenceRepositoryImpl; private set
     lateinit var automationSimulator: AutomationSimulator; private set
+    // Phase 10 engines
+    lateinit var healthEngine: com.nexus.app.data.automation.health.AutomationHealthEngine; private set
+    lateinit var safetyEngine: com.nexus.app.data.automation.safety.AutomationSafetyEngine; private set
     lateinit var nfcEventSource: NfcEventSource; private set
     lateinit var calendarEventSource: CalendarEventSource; private set
     lateinit var notificationEventSource: NotificationEventSource; private set

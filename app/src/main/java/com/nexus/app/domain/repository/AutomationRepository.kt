@@ -3,6 +3,8 @@ package com.nexus.app.domain.repository
 import com.nexus.app.domain.model.automation.AutomationExecution
 import com.nexus.app.domain.model.automation.AutomationRule
 import com.nexus.app.domain.model.automation.TriggerType
+import com.nexus.app.domain.model.smart.AutomationHealth
+import com.nexus.app.domain.model.smart.AutomationPriority
 import kotlinx.coroutines.flow.Flow
 
 interface AutomationRepository {
@@ -22,4 +24,12 @@ interface AutomationRepository {
     fun observeRecentExecutions(limit: Int = 50): Flow<List<AutomationExecution>>
     fun observeExecutionsForAutomation(automationId: String): Flow<List<AutomationExecution>>
     suspend fun pruneOldExecutions(keepCount: Int = 100)
+
+    // Phase 10 additions
+    suspend fun updatePriority(id: String, priority: AutomationPriority)
+    suspend fun updateHealth(id: String, health: AutomationHealth)
+    suspend fun recordSuccess(id: String)
+    suspend fun recordFailure(id: String)
+    suspend fun getAllRules(): List<AutomationRule>
+    suspend fun getAllExecutions(): List<AutomationExecution>
 }

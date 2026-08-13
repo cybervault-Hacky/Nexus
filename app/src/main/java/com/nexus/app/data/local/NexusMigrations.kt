@@ -244,5 +244,18 @@ object NexusMigrations {
         }
     }
 
-    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+    val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `priority` INTEGER NOT NULL DEFAULT 1")
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `healthStatus` TEXT NOT NULL DEFAULT 'UNKNOWN'")
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `conditionsJson` TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `executionCount` INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `failureCount` INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE `automation_rules` ADD COLUMN `successCount` INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_rules_priority` ON `automation_rules` (`priority`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_rules_healthStatus` ON `automation_rules` (`healthStatus`)")
+        }
+    }
+
+    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
 }

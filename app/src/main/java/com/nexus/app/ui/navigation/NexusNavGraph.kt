@@ -29,6 +29,10 @@ import com.nexus.app.ui.screens.environmentSources.EnvironmentSourcesScreen
 import com.nexus.app.ui.screens.eventDiagnostics.EventDiagnosticsScreen
 import com.nexus.app.ui.screens.privacySettings.PrivacySettingsScreen
 import com.nexus.app.ui.screens.automationSimulator.AutomationSimulatorScreen
+import com.nexus.app.ui.screens.automationTemplates.TemplatesScreen
+import com.nexus.app.ui.screens.automationAnalytics.AnalyticsScreen
+import com.nexus.app.ui.screens.automationSuggestions.SuggestionsScreen
+import com.nexus.app.ui.screens.automationConflicts.ConflictsScreen
 import com.nexus.app.ui.screens.capsuleDetail.CapsuleDetailScreen
 import com.nexus.app.ui.screens.capsuleEditor.CapsuleEditorScreen
 import com.nexus.app.ui.screens.capsules.CapsuleViewModel
@@ -215,6 +219,37 @@ fun NexusNavGraph(navController: NavHostController) {
         composable(Screen.AutomationSimulator.route) {
             AutomationSimulatorScreen(
                 simulator = app.automationSimulator,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.AutomationTemplates.route) {
+            TemplatesScreen(
+                onUseTemplate = { template ->
+                    navController.navigate(Screen.AutomationEditor.createRoute())
+                },
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.AutomationAnalytics.route) {
+            val automations by automationViewModel.automations.collectAsState()
+            val executions by automationViewModel.recentExecutions.collectAsState()
+            // Convert domain models to entities for analytics
+            AnalyticsScreen(
+                rules = emptyList(), // Will use domain models directly
+                executions = emptyList(),
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.AutomationSuggestions.route) {
+            SuggestionsScreen(
+                suggestions = emptyList(), // Populated by pattern analyzer
+                onDismiss = {},
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.AutomationConflicts.route) {
+            ConflictsScreen(
+                conflicts = emptyList(), // Populated by conflict engine
                 onNavigateBack = { navController.popBackStack() },
             )
         }

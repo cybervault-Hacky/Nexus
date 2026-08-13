@@ -48,4 +48,20 @@ interface AutomationDao {
 
     @Query("SELECT COUNT(*) FROM automation_rules WHERE isEnabled = 1")
     fun observeEnabledCount(): Flow<Int>
+
+    // Phase 10
+    @Query("UPDATE automation_rules SET priority = :priority, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updatePriority(id: String, priority: Int, updatedAt: Long)
+
+    @Query("UPDATE automation_rules SET healthStatus = :health, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateHealth(id: String, health: String, updatedAt: Long)
+
+    @Query("UPDATE automation_rules SET executionCount = executionCount + 1, successCount = successCount + 1, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun recordSuccess(id: String, updatedAt: Long)
+
+    @Query("UPDATE automation_rules SET executionCount = executionCount + 1, failureCount = failureCount + 1, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun recordFailure(id: String, updatedAt: Long)
+
+    @Query("SELECT * FROM automation_rules")
+    suspend fun getAllRules(): List<AutomationEntity>
 }

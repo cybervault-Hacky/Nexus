@@ -68,9 +68,36 @@ class AutomationRepositoryImpl(
     override suspend fun pruneOldExecutions(keepCount: Int) {
         val count = executionDao.count()
         if (count > keepCount) {
-            // Keep most recent; delete older than a safe cutoff
-            val cutoff = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000) // 30 days
+            val cutoff = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
             executionDao.deleteOlderThan(cutoff)
         }
     }
+
+    // Phase 10
+    override suspend fun updatePriority(id: String, priority: AutomationPriority) {
+        automationDao.updatePriority(id, priority.level, System.currentTimeMillis())
+    }
+
+    override suspend fun updateHealth(id: String, health: AutomationHealth) {
+        automationDao.updateHealth(id, health.name, System.currentTimeMillis())
+    }
+
+    override suspend fun recordSuccess(id: String) {
+        automationDao.recordSuccess(id, System.currentTimeMillis())
+    }
+
+    override suspend fun recordFailure(id: String) {
+        automationDao.recordFailure(id, System.currentTimeMillis())
+    }
+
+    override suspend fun getAllRules(): List<AutomationRule> =
+        automationDao.getAllRules().map { it.toDomain() }
+
+    override suspend fun getAllExecutions(): List<AutomationExecution> =
+        executionDao.observeRecent(1000).map { list -> list.map { it.toDomain() } }.let { flow ->
+            // One-shot read via first emission
+            var result = emptyList<AutomationExecution>()
+            flow.collect { result = it; return@collect }
+            result
+        }
 }
