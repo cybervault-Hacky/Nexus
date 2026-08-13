@@ -20,6 +20,11 @@ import com.nexus.app.ui.screens.actionEditor.ActionEditorScreen
 import com.nexus.app.ui.screens.actionEditor.ActionViewModel
 import com.nexus.app.ui.screens.appPicker.AppPickerScreen
 import com.nexus.app.ui.screens.appPicker.AppViewModel
+import com.nexus.app.ui.screens.automationDetail.AutomationDetailScreen
+import com.nexus.app.ui.screens.automationEditor.AutomationEditorScreen
+import com.nexus.app.ui.screens.automationHistory.AutomationHistoryScreen
+import com.nexus.app.ui.screens.automations.AutomationScreen
+import com.nexus.app.ui.screens.automations.AutomationViewModel
 import com.nexus.app.ui.screens.capsuleDetail.CapsuleDetailScreen
 import com.nexus.app.ui.screens.capsuleEditor.CapsuleEditorScreen
 import com.nexus.app.ui.screens.capsules.CapsuleViewModel
@@ -33,13 +38,8 @@ import com.nexus.app.ui.screens.contexts.ContextsScreen
 import com.nexus.app.ui.screens.home.HomeScreen
 import com.nexus.app.ui.screens.settings.SettingsScreen
 
-/** Duration used for all navigation transitions. */
 private const val TRANSITION_DURATION = 300
 
-/**
- * Top-level NavHost for NEXUS.
- * Creates shared ViewModels and routes to all destinations.
- */
 @Composable
 fun NexusNavGraph(navController: NavHostController) {
     val app = LocalContext.current.applicationContext as NexusApplication
@@ -73,43 +73,39 @@ fun NexusNavGraph(navController: NavHostController) {
             restoreEngine = app.capsuleRestoreEngine,
         ),
     )
+    val automationViewModel: AutomationViewModel = viewModel(
+        factory = AutomationViewModel.Factory(
+            repository = app.automationRepository,
+            triggerEngine = app.triggerEngine,
+            scheduler = app.automationScheduler,
+        ),
+    )
 
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
         enterTransition = {
             fadeIn(animationSpec = tween(TRANSITION_DURATION)) +
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(TRANSITION_DURATION),
-                )
+                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start, animationSpec = tween(TRANSITION_DURATION))
         },
         exitTransition = {
             fadeOut(animationSpec = tween(TRANSITION_DURATION)) +
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(TRANSITION_DURATION),
-                )
+                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Start, animationSpec = tween(TRANSITION_DURATION))
         },
         popEnterTransition = {
             fadeIn(animationSpec = tween(TRANSITION_DURATION)) +
-                slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(TRANSITION_DURATION),
-                )
+                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.End, animationSpec = tween(TRANSITION_DURATION))
         },
         popExitTransition = {
             fadeOut(animationSpec = tween(TRANSITION_DURATION)) +
-                slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(TRANSITION_DURATION),
-                )
+                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.End, animationSpec = tween(TRANSITION_DURATION))
         },
     ) {
         // ── Top-level destinations ───────────────────────────
         composable(Screen.Home.route) {
             val activeContext by contextViewModel.activeContext.collectAsState()
             val capsules by capsuleViewModel.capsules.collectAsState()
+            val enabledAutomations by automationViewModel.enabledCount.collectAsState()
             HomeScreen(
                 onNavigate = { screen ->
                     navController.navigate(screen.route) {
@@ -118,180 +114,77 @@ fun NexusNavGraph(navController: NavHostController) {
                         restoreState = true
                     }
                 },
-                onNavigateToContextDetail = { contextId ->
-                    navController.navigate(Screen.ContextDetail.createRoute(contextId))
-                },
-                onNavigateToCapsuleDetail = { capsuleId ->
-                    navController.navigate(Screen.CapsuleDetail.createRoute(capsuleId))
-                },
+                onNavigateToContextDetail = { navController.navigate(Screen.ContextDetail.createRoute(it)) },
+                onNavigateToCapsuleDetail = { navController.navigate(Screen.CapsuleDetail.createRoute(it)) },
                 activeContext = activeContext,
                 recentCapsules = capsules,
+                activeAutomationCount = enabledAutomations,
             )
         }
         composable(Screen.Contexts.route) {
-            ContextsScreen(
-                viewModel = contextViewModel,
-                onNavigateToDetail = { contextId ->
-                    navController.navigate(Screen.ContextDetail.createRoute(contextId))
-                },
-                onNavigateToCreate = {
-                    navController.navigate(Screen.ContextEditor.createRoute())
-                },
-            )
+            ContextsScreen(viewModel = contextViewModel, onNavigateToDetail = { navController.navigate(Screen.ContextDetail.createRoute(it)) }, onNavigateToCreate = { navController.navigate(Screen.ContextEditor.createRoute()) })
         }
         composable(Screen.Capsules.route) {
-            CapsulesScreen(
-                viewModel = capsuleViewModel,
-                onNavigateToDetail = { capsuleId ->
-                    navController.navigate(Screen.CapsuleDetail.createRoute(capsuleId))
-                },
+            CapsulesScreen(viewModel = capsuleViewModel, onNavigateToDetail = { navController.navigate(Screen.CapsuleDetail.createRoute(it)) })
+        }
+        composable(Screen.Actions.route) { QuickActionsScreen() }
+        composable(Screen.Automations.route) {
+            AutomationScreen(viewModel = automationViewModel, onNavigateToDetail = { navController.navigate(Screen.AutomationDetail.createRoute(it)) }, onNavigateToCreate = { navController.navigate(Screen.AutomationEditor.createRoute()) })
+        }
+        composable(Screen.Settings.route) { SettingsScreen() }
+
+        // ── Context sub-screens ──────────────────────────────
+        composable(Screen.ContextDetail.route, arguments = listOf(navArgument("contextId") { type = NavType.StringType })) { entry ->
+            val ctxId = entry.arguments?.getString("contextId") ?: return@composable
+            ContextDetailScreen(ctxId, contextViewModel, appViewModel, actionViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToEdit = { navController.navigate(Screen.ContextEditor.createRoute(it)) },
+                onNavigateToAddApps = { navController.navigate(Screen.AppPicker.createRoute(it)) },
+                onNavigateToAddAction = { navController.navigate(Screen.ActionEditor.createRoute(it)) },
+                onNavigateToEditAction = { navController.navigate(Screen.ActionEditor.createRoute(ctxId, it)) },
+                onNavigateToCaptureCapsule = { navController.navigate(Screen.CapsuleEditor.createRoute(it, contextViewModel.contexts.value.find { c -> c.id == it }?.name ?: "")) },
             )
         }
-        composable(Screen.Actions.route) {
-            QuickActionsScreen()
+        composable(Screen.ContextEditor.route, arguments = listOf(navArgument("contextId") { type = NavType.StringType; defaultValue = "" })) { entry ->
+            val editingId = entry.arguments?.getString("contextId")?.takeIf { it.isNotBlank() }
+            ContextEditorScreen(contextViewModel, editingId, onNavigateBack = { navController.popBackStack() })
         }
-        composable(Screen.Settings.route) {
-            SettingsScreen()
+        composable(Screen.AppPicker.route, arguments = listOf(navArgument("contextId") { type = NavType.StringType })) { entry ->
+            val ctxId = entry.arguments?.getString("contextId") ?: return@composable
+            AppPickerScreen(ctxId, appViewModel, onConfirm = { navController.popBackStack() }, onNavigateBack = { navController.popBackStack() })
+        }
+        composable(Screen.ActionEditor.route, arguments = listOf(navArgument("contextId") { type = NavType.StringType }, navArgument("actionId") { type = NavType.StringType; defaultValue = "" })) { entry ->
+            val ctxId = entry.arguments?.getString("contextId") ?: return@composable
+            val actId = entry.arguments?.getString("actionId")?.takeIf { it.isNotBlank() }
+            ActionEditorScreen(ctxId, actId, actionViewModel, onNavigateBack = { navController.popBackStack() })
         }
 
-        // ── Context detail ───────────────────────────────────
-        composable(
-            route = Screen.ContextDetail.route,
-            arguments = listOf(navArgument("contextId") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val contextId = backStackEntry.arguments?.getString("contextId") ?: return@composable
-            ContextDetailScreen(
-                contextId = contextId,
-                viewModel = contextViewModel,
-                appViewModel = appViewModel,
-                actionViewModel = actionViewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToEdit = { id ->
-                    navController.navigate(Screen.ContextEditor.createRoute(id))
-                },
-                onNavigateToAddApps = { id ->
-                    navController.navigate(Screen.AppPicker.createRoute(id))
-                },
-                onNavigateToAddAction = { id ->
-                    navController.navigate(Screen.ActionEditor.createRoute(id))
-                },
-                onNavigateToEditAction = { actionId ->
-                    navController.navigate(Screen.ActionEditor.createRoute(contextId, actionId))
-                },
-                onNavigateToCaptureCapsule = { id ->
-                    val ctx = contextViewModel.contexts.value.find { it.id == id }
-                    navController.navigate(Screen.CapsuleEditor.createRoute(id, ctx?.name ?: ""))
-                },
-            )
+        // ── Capsule sub-screens ──────────────────────────────
+        composable(Screen.CapsuleDetail.route, arguments = listOf(navArgument("capsuleId") { type = NavType.StringType })) { entry ->
+            val capId = entry.arguments?.getString("capsuleId") ?: return@composable
+            CapsuleDetailScreen(capId, capsuleViewModel, onNavigateBack = { navController.popBackStack() }, onNavigateToRestore = { navController.navigate(Screen.CapsuleRestore.createRoute(it)) })
+        }
+        composable(Screen.CapsuleEditor.route, arguments = listOf(navArgument("contextId") { type = NavType.StringType }, navArgument("contextName") { type = NavType.StringType; defaultValue = "" })) { entry ->
+            val ctxId = entry.arguments?.getString("contextId") ?: return@composable
+            val ctxName = entry.arguments?.getString("contextName") ?: ""
+            CapsuleEditorScreen(ctxId, ctxName, capsuleViewModel, onNavigateBack = { navController.popBackStack() })
+        }
+        composable(Screen.CapsuleRestore.route, arguments = listOf(navArgument("capsuleId") { type = NavType.StringType })) { entry ->
+            val capId = entry.arguments?.getString("capsuleId") ?: return@composable
+            RestoreFlowScreen(capId, capsuleRestoreViewModel, onNavigateBack = { navController.popBackStack() }, onNavigateToContext = { navController.popBackStack(); navController.navigate(Screen.ContextDetail.createRoute(it)) })
         }
 
-        // ── Context editor ───────────────────────────────────
-        composable(
-            route = Screen.ContextEditor.route,
-            arguments = listOf(
-                navArgument("contextId") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                },
-            ),
-        ) { backStackEntry ->
-            val editingId = backStackEntry.arguments?.getString("contextId")
-                ?.takeIf { it.isNotBlank() }
-            ContextEditorScreen(
-                viewModel = contextViewModel,
-                editingContextId = editingId,
-                onNavigateBack = { navController.popBackStack() },
-            )
+        // ── Automation sub-screens ────────────────────────────
+        composable(Screen.AutomationDetail.route, arguments = listOf(navArgument("automationId") { type = NavType.StringType })) { entry ->
+            val autoId = entry.arguments?.getString("automationId") ?: return@composable
+            AutomationDetailScreen(autoId, automationViewModel, onNavigateBack = { navController.popBackStack() }, onNavigateToEdit = { navController.navigate(Screen.AutomationEditor.createRoute(it)) })
         }
-
-        // ── App picker ───────────────────────────────────────
-        composable(
-            route = Screen.AppPicker.route,
-            arguments = listOf(navArgument("contextId") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val contextId = backStackEntry.arguments?.getString("contextId") ?: return@composable
-            AppPickerScreen(
-                contextId = contextId,
-                viewModel = appViewModel,
-                onConfirm = { navController.popBackStack() },
-                onNavigateBack = { navController.popBackStack() },
-            )
+        composable(Screen.AutomationEditor.route, arguments = listOf(navArgument("automationId") { type = NavType.StringType; defaultValue = "" })) { entry ->
+            val editingId = entry.arguments?.getString("automationId")?.takeIf { it.isNotBlank() }
+            AutomationEditorScreen(editingId, automationViewModel, availableContexts = contextViewModel.contexts.value, onNavigateBack = { navController.popBackStack() })
         }
-
-        // ── Action editor ────────────────────────────────────
-        composable(
-            route = Screen.ActionEditor.route,
-            arguments = listOf(
-                navArgument("contextId") { type = NavType.StringType },
-                navArgument("actionId") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                },
-            ),
-        ) { backStackEntry ->
-            val contextId = backStackEntry.arguments?.getString("contextId") ?: return@composable
-            val actionId = backStackEntry.arguments?.getString("actionId")
-                ?.takeIf { it.isNotBlank() }
-            ActionEditorScreen(
-                contextId = contextId,
-                editingActionId = actionId,
-                viewModel = actionViewModel,
-                onNavigateBack = { navController.popBackStack() },
-            )
-        }
-
-        // ── Capsule detail ───────────────────────────────────
-        composable(
-            route = Screen.CapsuleDetail.route,
-            arguments = listOf(navArgument("capsuleId") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val capsuleId = backStackEntry.arguments?.getString("capsuleId") ?: return@composable
-            CapsuleDetailScreen(
-                capsuleId = capsuleId,
-                viewModel = capsuleViewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToRestore = { id ->
-                    navController.navigate(Screen.CapsuleRestore.createRoute(id))
-                },
-            )
-        }
-
-        // ── Capsule editor (capture) ─────────────────────────
-        composable(
-            route = Screen.CapsuleEditor.route,
-            arguments = listOf(
-                navArgument("contextId") { type = NavType.StringType },
-                navArgument("contextName") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                },
-            ),
-        ) { backStackEntry ->
-            val contextId = backStackEntry.arguments?.getString("contextId") ?: return@composable
-            val contextName = backStackEntry.arguments?.getString("contextName") ?: ""
-            CapsuleEditorScreen(
-                contextId = contextId,
-                contextName = contextName,
-                viewModel = capsuleViewModel,
-                onNavigateBack = { navController.popBackStack() },
-            )
-        }
-
-        // ── Capsule restore flow ─────────────────────────────
-        composable(
-            route = Screen.CapsuleRestore.route,
-            arguments = listOf(navArgument("capsuleId") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val capsuleId = backStackEntry.arguments?.getString("capsuleId") ?: return@composable
-            RestoreFlowScreen(
-                capsuleId = capsuleId,
-                viewModel = capsuleRestoreViewModel,
-                onNavigateBack = { navController.popBackStack() },
-                onNavigateToContext = { contextId ->
-                    navController.popBackStack()
-                    navController.navigate(Screen.ContextDetail.createRoute(contextId))
-                },
-            )
+        composable(Screen.AutomationHistory.route) {
+            AutomationHistoryScreen(automationViewModel, onNavigateBack = { navController.popBackStack() })
         }
     }
 }

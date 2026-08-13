@@ -18,30 +18,25 @@ import androidx.navigation.compose.rememberNavController
 import com.nexus.app.ui.navigation.NexusNavGraph
 import com.nexus.app.ui.navigation.Screen
 
-/**
- * Top-level scaffold that hosts the [NexusNavGraph] and [NexusBottomBar].
- * The bottom bar is hidden on sub-screens (detail, editor) for a cleaner UX.
- */
 @Composable
 fun NexusScaffold() {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
         ?: Screen.Home.route
 
-    // Hide the bottom bar on detail/editor/picker/restore screens
-    val showBottomBar = currentRoute in listOf(
-        Screen.Home.route,
-        Screen.Contexts.route,
-        Screen.Capsules.route,
-        Screen.Actions.route,
-        Screen.Settings.route,
-    ) && !currentRoute.startsWith("context_detail") &&
-        !currentRoute.startsWith("context_editor") &&
-        !currentRoute.startsWith("app_picker") &&
-        !currentRoute.startsWith("action_editor") &&
-        !currentRoute.startsWith("capsule_detail") &&
-        !currentRoute.startsWith("capsule_editor") &&
-        !currentRoute.startsWith("capsule_restore")
+    val topLevelRoutes = Screen.bottomNavItems.map { it.route }
+    val isSubScreen = currentRoute.startsWith("context_detail") ||
+        currentRoute.startsWith("context_editor") ||
+        currentRoute.startsWith("app_picker") ||
+        currentRoute.startsWith("action_editor") ||
+        currentRoute.startsWith("capsule_detail") ||
+        currentRoute.startsWith("capsule_editor") ||
+        currentRoute.startsWith("capsule_restore") ||
+        currentRoute.startsWith("automation_detail") ||
+        currentRoute.startsWith("automation_editor") ||
+        currentRoute == Screen.AutomationHistory.route
+
+    val showBottomBar = currentRoute in topLevelRoutes && !isSubScreen
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -65,11 +60,7 @@ fun NexusScaffold() {
             }
         },
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             NexusNavGraph(navController = navController)
         }
     }

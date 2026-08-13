@@ -179,5 +179,52 @@ object NexusMigrations {
         }
     }
 
-    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+
+    val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `automation_rules` (
+                    `id` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `description` TEXT NOT NULL DEFAULT '',
+                    `isEnabled` INTEGER NOT NULL DEFAULT 1,
+                    `triggerType` TEXT NOT NULL,
+                    `triggerPayload` TEXT NOT NULL,
+                    `contextId` TEXT NOT NULL,
+                    `cooldownSeconds` INTEGER NOT NULL DEFAULT 60,
+                    `lastTriggeredAt` INTEGER,
+                    `createdAt` INTEGER NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_rules_contextId` ON `automation_rules` (`contextId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_rules_isEnabled` ON `automation_rules` (`isEnabled`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_rules_triggerType` ON `automation_rules` (`triggerType`)")
+
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `automation_executions` (
+                    `id` TEXT NOT NULL,
+                    `automationId` TEXT NOT NULL,
+                    `startedAt` INTEGER NOT NULL,
+                    `completedAt` INTEGER,
+                    `status` TEXT NOT NULL,
+                    `triggerType` TEXT NOT NULL,
+                    `contextId` TEXT,
+                    `successfulActions` INTEGER NOT NULL DEFAULT 0,
+                    `failedActions` INTEGER NOT NULL DEFAULT 0,
+                    `errorMessage` TEXT,
+                    PRIMARY KEY(`id`),
+                    FOREIGN KEY(`automationId`) REFERENCES `automation_rules`(`id`) ON DELETE CASCADE
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_executions_automationId` ON `automation_executions` (`automationId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_executions_startedAt` ON `automation_executions` (`startedAt`)")
+        }
+    }
 }

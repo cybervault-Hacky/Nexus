@@ -105,8 +105,35 @@ sealed class Screen(
         fun createRoute(capsuleId: String) = "capsule_restore/$capsuleId"
     }
 
+    /** Automations top-level tab. */
+    data object Automations : Screen(
+        route = "automations",
+        label = "Automate",
+        selectedIcon = androidx.compose.material.icons.rounded.AutoAwesome,
+        unselectedIcon = androidx.compose.material.icons.outlined.AutoAwesome,
+    )
+
+    /** Automation detail — argument: automationId */
+    data object AutomationDetail {
+        const val route = "automation_detail/{automationId}"
+        fun createRoute(automationId: String) = "automation_detail/$automationId"
+    }
+
+    /** Automation editor — argument: automationId (empty for create) */
+    data object AutomationEditor {
+        const val route = "automation_editor?automationId={automationId}"
+        fun createRoute(automationId: String? = null): String =
+            if (automationId != null) "automation_editor?automationId=$automationId"
+            else "automation_editor"
+    }
+
+    /** Automation execution history */
+    data object AutomationHistory {
+        const val route = "automation_history"
+    }
+
     companion object {
         /** Ordered list of screens shown in the bottom nav bar. */
-        val bottomNavItems = listOf(Home, Contexts, Capsules, Actions, Settings)
+        val bottomNavItems = listOf(Home, Contexts, Capsules, Actions, Automations, Settings)
     }
 }

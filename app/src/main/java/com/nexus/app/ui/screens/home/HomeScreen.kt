@@ -48,6 +48,7 @@ fun HomeScreen(
     onNavigateToCapsuleDetail: (String) -> Unit,
     activeContext: NexusContext?,
     recentCapsules: List<NexusCapsule>,
+    activeAutomationCount: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     // Staggered entrance animation
@@ -173,11 +174,36 @@ fun HomeScreen(
             }
         }
 
-        // ── Quick Actions ────────────────────────────────────
+        // ── Automations ────────────────────────────────────
         item {
             AnimatedVisibility(
                 visible = showActions,
                 enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 },
+            ) {
+                Column(
+                    modifier = Modifier.padding(top = NexusSpacing.sectionGap),
+                ) {
+                    SectionHeader(
+                        title = "Automations",
+                        actionLabel = "See all",
+                        onAction = { onNavigate(Screen.Automations) },
+                        modifier = Modifier.padding(horizontal = NexusSpacing.screenPadding),
+                    )
+                    Text(
+                        text = if (activeAutomationCount > 0) "$activeAutomationCount active automations" else "No active automations",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = NexusSpacing.screenPadding),
+                    )
+                }
+            }
+        }
+
+        // ── Quick Actions ────────────────────────────────────
+        item {
+            AnimatedVisibility(
+                visible = showActions,
+                enter = fadeIn(tween(450)) + slideInVertically(tween(450)) { it / 4 },
             ) {
                 Column(
                     modifier = Modifier.padding(top = NexusSpacing.sectionGap),

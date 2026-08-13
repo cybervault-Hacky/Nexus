@@ -14,6 +14,7 @@ import androidx.room.RoomDatabase
  * Version 4 (Phase 5 initial): adds capsules and capsule_apps tables
  * Version 5 (Phase 5 complete): adds capsule_actions, schema version,
  *   sourceContextId, capturedAt, appName on capsule_apps
+ * Version 6 (Phase 7): adds automation_rules and automation_executions tables
  */
 @Database(
     entities = [
@@ -23,8 +24,10 @@ import androidx.room.RoomDatabase
         CapsuleEntity::class,
         CapsuleAppEntity::class,
         CapsuleActionEntity::class,
+        AutomationEntity::class,
+        AutomationExecutionEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class NexusDatabase : RoomDatabase() {
@@ -35,6 +38,8 @@ abstract class NexusDatabase : RoomDatabase() {
     abstract fun capsuleDao(): CapsuleDao
     abstract fun capsuleAppDao(): CapsuleAppDao
     abstract fun capsuleActionDao(): CapsuleActionDao
+    abstract fun automationDao(): AutomationDao
+    abstract fun automationExecutionDao(): AutomationExecutionDao
 
     companion object {
         private const val DATABASE_NAME = "nexus.db"

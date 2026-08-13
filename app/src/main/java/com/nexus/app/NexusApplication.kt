@@ -8,8 +8,11 @@ import com.nexus.app.data.action.OpenUrlHandler
 import com.nexus.app.data.action.WorkflowExecutor
 import com.nexus.app.data.app.AppLauncher
 import com.nexus.app.data.app.InstalledAppDataSource
+import com.nexus.app.data.automation.AutomationScheduler
+import com.nexus.app.data.automation.TriggerEngine
 import com.nexus.app.data.local.NexusDatabase
 import com.nexus.app.data.repository.ActionRepositoryImpl
+import com.nexus.app.data.repository.AutomationRepositoryImpl
 import com.nexus.app.data.repository.CapsuleRepositoryImpl
 import com.nexus.app.data.repository.ContextAppRepositoryImpl
 import com.nexus.app.data.repository.ContextRepositoryImpl
@@ -18,15 +21,12 @@ import com.nexus.app.data.restore.CapsuleRestoreEngine
 import com.nexus.app.data.restore.RestorePreviewEngine
 import com.nexus.app.domain.model.ActionType
 import com.nexus.app.domain.repository.ActionRepository
+import com.nexus.app.domain.repository.AutomationRepository
 import com.nexus.app.domain.repository.CapsuleRepository
 import com.nexus.app.domain.repository.ContextAppRepository
 import com.nexus.app.domain.repository.ContextRepository
 import com.nexus.app.domain.repository.InstalledAppRepository
 
-/**
- * Application entry point.
- * Provides a lightweight service locator for all repositories and engines.
- */
 class NexusApplication : Application() {
 
     lateinit var contextRepository: ContextRepository
@@ -39,6 +39,8 @@ class NexusApplication : Application() {
         private set
     lateinit var capsuleRepository: CapsuleRepository
         private set
+    lateinit var automationRepository: AutomationRepository
+        private set
     lateinit var appLauncher: AppLauncher
         private set
     lateinit var workflowExecutor: WorkflowExecutor
@@ -46,6 +48,10 @@ class NexusApplication : Application() {
     lateinit var restorePreviewEngine: RestorePreviewEngine
         private set
     lateinit var capsuleRestoreEngine: CapsuleRestoreEngine
+        private set
+    lateinit var triggerEngine: TriggerEngine
+        private set
+    lateinit var automationScheduler: AutomationScheduler
         private set
 
     override fun onCreate() {
@@ -78,7 +84,11 @@ class NexusApplication : Application() {
             actionDao = database.actionDao(),
         )
 
-        // Build the execution engine
+        automationRepository = AutomationRepositoryImpl(
+            automationDao = database.automationDao(),
+            executionDao = database.automationExecutionDao(),
+        )
+
         val actionExecutor = ActionExecutor(
             handlers = mapOf(
                 ActionType.OPEN_APP to OpenAppHandler(appLauncher),
@@ -88,7 +98,6 @@ class NexusApplication : Application() {
         )
         workflowExecutor = WorkflowExecutor(actionExecutor)
 
-        // Build the restoration engines
         restorePreviewEngine = RestorePreviewEngine(installedAppRepository)
         capsuleRestoreEngine = CapsuleRestoreEngine(
             database = database,
@@ -97,5 +106,8 @@ class NexusApplication : Application() {
             actionDao = database.actionDao(),
             installedAppRepository = installedAppRepository,
         )
+
+        triggerEngine = TriggerEngine(automationRepository, actionRepository, workflowExecutor)
+        automationScheduler = AutomationScheduler(applicationContext)
     }
 }
