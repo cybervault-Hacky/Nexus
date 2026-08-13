@@ -118,6 +118,16 @@ fun AutomationDetailScreen(
                                     TriggerType.SCREEN_OFF -> "Screen Off"
                                     TriggerType.DEVICE_IDLE -> "Device Idle"
                                     TriggerType.DEVICE_ACTIVE -> "Device Active"
+                                    TriggerType.NFC_TAG_DETECTED -> "NFC Tag"
+                                    TriggerType.NFC_TAG_REMOVED -> "NFC Removed"
+                                    TriggerType.GEOFENCE_ENTER -> "Geofence Enter"
+                                    TriggerType.GEOFENCE_EXIT -> "Geofence Exit"
+                                    TriggerType.CALENDAR_EVENT_START -> "Calendar Start"
+                                    TriggerType.CALENDAR_EVENT_END -> "Calendar End"
+                                    TriggerType.NOTIFICATION_POSTED -> "Notification"
+                                    TriggerType.NOTIFICATION_REMOVED -> "Notification Removed"
+                                    TriggerType.ALL_CONDITIONS -> "All Conditions"
+                                    TriggerType.ANY_CONDITION -> "Any Condition"
                                 }
                                 StatusBadge(text = triggerLabel, backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), textColor = MaterialTheme.colorScheme.primary)
                             }

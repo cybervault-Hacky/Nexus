@@ -185,6 +185,16 @@ fun AutomationEditorScreen(
                                 TriggerType.SCREEN_OFF -> "Screen Off"
                                 TriggerType.DEVICE_IDLE -> "Idle"
                                 TriggerType.DEVICE_ACTIVE -> "Active"
+                                TriggerType.NFC_TAG_DETECTED -> "NFC Tag"
+                                TriggerType.NFC_TAG_REMOVED -> "NFC Removed"
+                                TriggerType.GEOFENCE_ENTER -> "Geofence In"
+                                TriggerType.GEOFENCE_EXIT -> "Geofence Out"
+                                TriggerType.CALENDAR_EVENT_START -> "Cal Start"
+                                TriggerType.CALENDAR_EVENT_END -> "Cal End"
+                                TriggerType.NOTIFICATION_POSTED -> "Notification"
+                                TriggerType.NOTIFICATION_REMOVED -> "Notif Off"
+                                TriggerType.ALL_CONDITIONS -> "ALL"
+                                TriggerType.ANY_CONDITION -> "ANY"
                             }
                             val selected = type == selectedTrigger
                             GlassSurface(

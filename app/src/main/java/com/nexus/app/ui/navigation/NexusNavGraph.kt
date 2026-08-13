@@ -26,6 +26,9 @@ import com.nexus.app.ui.screens.automationHistory.AutomationHistoryScreen
 import com.nexus.app.ui.screens.automations.AutomationScreen
 import com.nexus.app.ui.screens.automations.AutomationViewModel
 import com.nexus.app.ui.screens.environmentSources.EnvironmentSourcesScreen
+import com.nexus.app.ui.screens.eventDiagnostics.EventDiagnosticsScreen
+import com.nexus.app.ui.screens.privacySettings.PrivacySettingsScreen
+import com.nexus.app.ui.screens.automationSimulator.AutomationSimulatorScreen
 import com.nexus.app.ui.screens.capsuleDetail.CapsuleDetailScreen
 import com.nexus.app.ui.screens.capsuleEditor.CapsuleEditorScreen
 import com.nexus.app.ui.screens.capsules.CapsuleViewModel
@@ -191,6 +194,27 @@ fun NexusNavGraph(navController: NavHostController) {
             EnvironmentSourcesScreen(
                 registry = app.eventSourceRegistry,
                 settings = app.automationSettings,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.PrivacySettings.route) {
+            PrivacySettingsScreen(
+                capabilityManager = app.capabilityManager,
+                nfcSource = app.nfcEventSource,
+                notificationSource = app.notificationEventSource,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.EventDiagnostics.route) {
+            EventDiagnosticsScreen(
+                registry = app.eventSourceRegistry,
+                historyRepository = app.eventHistoryRepository,
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(Screen.AutomationSimulator.route) {
+            AutomationSimulatorScreen(
+                simulator = app.automationSimulator,
                 onNavigateBack = { navController.popBackStack() },
             )
         }

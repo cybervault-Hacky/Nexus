@@ -138,6 +138,16 @@ private fun AutomationCard(
         TriggerType.SCREEN_OFF -> "Screen Off"
         TriggerType.DEVICE_IDLE -> "Idle"
         TriggerType.DEVICE_ACTIVE -> "Active"
+        TriggerType.NFC_TAG_DETECTED -> "NFC"
+        TriggerType.NFC_TAG_REMOVED -> "NFC Off"
+        TriggerType.GEOFENCE_ENTER -> "Geo In"
+        TriggerType.GEOFENCE_EXIT -> "Geo Out"
+        TriggerType.CALENDAR_EVENT_START -> "Cal"
+        TriggerType.CALENDAR_EVENT_END -> "Cal End"
+        TriggerType.NOTIFICATION_POSTED -> "Notif"
+        TriggerType.NOTIFICATION_REMOVED -> "Notif Off"
+        TriggerType.ALL_CONDITIONS -> "ALL"
+        TriggerType.ANY_CONDITION -> "ANY"
     }
 
     GlassSurface(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {

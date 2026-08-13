@@ -179,8 +179,6 @@ object NexusMigrations {
         }
     }
 
-    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
-
     val MIGRATION_5_6 = object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL(
@@ -227,4 +225,24 @@ object NexusMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_automation_executions_startedAt` ON `automation_executions` (`startedAt`)")
         }
     }
+
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `event_history` (
+                    `id` TEXT NOT NULL,
+                    `source` TEXT NOT NULL,
+                    `eventType` TEXT NOT NULL,
+                    `timestamp` INTEGER NOT NULL,
+                    `matchedAutomationCount` INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_event_history_timestamp` ON `event_history` (`timestamp`)")
+        }
+    }
+
+    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
 }

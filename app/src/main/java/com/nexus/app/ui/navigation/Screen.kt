@@ -137,6 +137,21 @@ sealed class Screen(
         const val route = "environment_sources"
     }
 
+    /** Privacy settings */
+    data object PrivacySettings {
+        const val route = "privacy_settings"
+    }
+
+    /** Event diagnostics */
+    data object EventDiagnostics {
+        const val route = "event_diagnostics"
+    }
+
+    /** Automation simulator */
+    data object AutomationSimulator {
+        const val route = "automation_simulator"
+    }
+
     companion object {
         /** Ordered list of screens shown in the bottom nav bar. */
         val bottomNavItems = listOf(Home, Contexts, Capsules, Actions, Automations, Settings)

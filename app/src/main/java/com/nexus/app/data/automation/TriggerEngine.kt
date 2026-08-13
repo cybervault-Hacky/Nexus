@@ -13,14 +13,8 @@ import kotlinx.coroutines.sync.withLock
 import java.util.UUID
 
 /**
- * Core automation engine.
- *
- * Receives [TriggerEvent]s, finds matching automations via [TriggerMatcher],
- * checks cooldowns, executes workflows via the existing [WorkflowExecutor],
- * and records execution history.
- *
- * Thread-safe: uses a Mutex to prevent duplicate concurrent executions
- * of the same automation.
+ * Core automation engine. Reused across all phases.
+ * Receives events → matches rules → checks cooldown → executes workflow.
  */
 class TriggerEngine(
     private val automationRepository: AutomationRepository,
@@ -29,17 +23,14 @@ class TriggerEngine(
 ) {
     private val executionMutex = Mutex()
 
-    /** Process a trigger event. */
     suspend fun onTrigger(event: TriggerEvent): List<AutomationExecution> {
         val matchingRules = findMatchingRules(event)
         return matchingRules.map { rule -> executeAutomation(rule, event) }
     }
 
-    /** Manually trigger a specific automation by ID. */
     suspend fun manualTrigger(automationId: String): AutomationExecution? {
         val rule = automationRepository.getById(automationId) ?: return null
-        val event = TriggerEvent.Manual(automationId)
-        return executeAutomation(rule, event)
+        return executeAutomation(rule, TriggerEvent.Manual(automationId))
     }
 
     private suspend fun findMatchingRules(event: TriggerEvent): List<AutomationRule> {
@@ -51,78 +42,61 @@ class TriggerEngine(
             is TriggerEvent.Time -> {
                 if (event.automationId != null) {
                     val rule = automationRepository.getById(event.automationId!!)
-                    if (rule != null && rule.isEnabled && rule.triggerType == TriggerType.TIME) listOf(rule)
-                    else emptyList()
+                    if (rule != null && rule.isEnabled && rule.triggerType == TriggerType.TIME) listOf(rule) else emptyList()
                 } else {
                     automationRepository.getEnabledByTriggerType(TriggerType.TIME)
                 }
             }
-            // All other events: use TriggerMatcher against enabled rules of matching type
-            else -> {
+            // Composite triggers
+            is TriggerEvent.WifiConnected, is TriggerEvent.WifiDisconnected,
+            is TriggerEvent.BluetoothConnected, is TriggerEvent.BluetoothDisconnected,
+            is TriggerEvent.ChargingStarted, is TriggerEvent.ChargingStopped,
+            is TriggerEvent.BatteryLevelChanged,
+            is TriggerEvent.DeviceBoot, is TriggerEvent.ScreenOn, is TriggerEvent.ScreenOff,
+            is TriggerEvent.DeviceIdle, is TriggerEvent.DeviceActive,
+            is TriggerEvent.NfcTagDetected, is TriggerEvent.NfcTagRemoved,
+            is TriggerEvent.GeofenceEntered, is TriggerEvent.GeofenceExited,
+            is TriggerEvent.CalendarEventStarted, is TriggerEvent.CalendarEventEnded,
+            is TriggerEvent.NotificationPosted, is TriggerEvent.NotificationRemoved,
+            is TriggerEvent.AppOpened, is TriggerEvent.AppClosed,
+            is TriggerEvent.ContextActivated -> {
                 val targetType = event.toTriggerType()
-                val rules = automationRepository.getEnabledByTriggerType(targetType)
-                rules.filter { TriggerMatcher.matches(event, it) }
+                val directRules = automationRepository.getEnabledByTriggerType(targetType).filter { TriggerMatcher.matches(event, it) }
+                // Also check composite triggers
+                val allRules = automationRepository.getEnabledByTriggerType(TriggerType.ALL_CONDITIONS) +
+                    automationRepository.getEnabledByTriggerType(TriggerType.ANY_CONDITION)
+                val compositeRules = allRules.filter { CompositeTriggerEvaluator.evaluate(it, event, allRules) }
+                directRules + compositeRules
             }
         }
     }
 
-    private suspend fun executeAutomation(
-        rule: AutomationRule,
-        event: TriggerEvent,
-    ): AutomationExecution {
+    private suspend fun executeAutomation(rule: AutomationRule, event: TriggerEvent): AutomationExecution {
         val executionId = UUID.randomUUID().toString()
         val startedAt = System.currentTimeMillis()
+        val triggerType = event.toTriggerType()
 
         return executionMutex.withLock {
-            // Check cooldown
             if (!CooldownPolicy.canExecute(rule)) {
-                val skipped = AutomationExecution(
-                    id = executionId, automationId = rule.id, startedAt = startedAt,
-                    completedAt = System.currentTimeMillis(), status = ExecutionStatus.SKIPPED_COOLDOWN,
-                    triggerType = event.toTriggerType(), contextId = rule.contextId,
-                    errorMessage = "Cooldown active (${CooldownPolicy.remainingCooldownSeconds(rule)}s remaining)",
-                )
-                automationRepository.recordExecution(skipped)
-                return@withLock skipped
+                return@withLock skip(executionId, rule, startedAt, triggerType, ExecutionStatus.SKIPPED_COOLDOWN,
+                    "Cooldown active (${CooldownPolicy.remainingCooldownSeconds(rule)}s)")
             }
-
-            // Check disabled (double-check)
             if (!rule.isEnabled) {
-                val skipped = AutomationExecution(
-                    id = executionId, automationId = rule.id, startedAt = startedAt,
-                    completedAt = System.currentTimeMillis(), status = ExecutionStatus.SKIPPED_DISABLED,
-                    triggerType = event.toTriggerType(), contextId = rule.contextId,
-                )
-                automationRepository.recordExecution(skipped)
-                return@withLock skipped
+                return@withLock skip(executionId, rule, startedAt, triggerType, ExecutionStatus.SKIPPED_DISABLED)
             }
-
-            // Load workflow actions
             val actions = actionRepository.getActionsForContext(rule.contextId)
             if (actions.isEmpty()) {
-                val skipped = AutomationExecution(
-                    id = executionId, automationId = rule.id, startedAt = startedAt,
-                    completedAt = System.currentTimeMillis(), status = ExecutionStatus.SKIPPED_INVALID,
-                    triggerType = event.toTriggerType(), contextId = rule.contextId,
-                    errorMessage = "No actions configured for context",
-                )
-                automationRepository.recordExecution(skipped)
-                return@withLock skipped
+                return@withLock skip(executionId, rule, startedAt, triggerType, ExecutionStatus.SKIPPED_INVALID, "No actions")
             }
 
-            // Mark triggered (starts cooldown)
             automationRepository.markTriggered(rule.id, startedAt)
-
-            // Execute workflow using existing WorkflowExecutor
             try {
                 val result = workflowExecutor.execute(actions)
-                val completedAt = System.currentTimeMillis()
-                val status = if (result.overallSuccess) ExecutionStatus.SUCCESS else ExecutionStatus.FAILED
-
                 val execution = AutomationExecution(
                     id = executionId, automationId = rule.id, startedAt = startedAt,
-                    completedAt = completedAt, status = status,
-                    triggerType = event.toTriggerType(), contextId = rule.contextId,
+                    completedAt = System.currentTimeMillis(),
+                    status = if (result.overallSuccess) ExecutionStatus.SUCCESS else ExecutionStatus.FAILED,
+                    triggerType = triggerType, contextId = rule.contextId,
                     successfulActions = result.completedCount,
                     failedActions = result.totalCount - result.completedCount,
                 )
@@ -132,7 +106,7 @@ class TriggerEngine(
                 val execution = AutomationExecution(
                     id = executionId, automationId = rule.id, startedAt = startedAt,
                     completedAt = System.currentTimeMillis(), status = ExecutionStatus.FAILED,
-                    triggerType = event.toTriggerType(), contextId = rule.contextId,
+                    triggerType = triggerType, contextId = rule.contextId,
                     errorMessage = e.message ?: "Unknown error",
                 )
                 automationRepository.recordExecution(execution)
@@ -140,9 +114,18 @@ class TriggerEngine(
             }
         }
     }
+
+    private suspend fun skip(id: String, rule: AutomationRule, startedAt: Long, triggerType: TriggerType, status: ExecutionStatus, msg: String? = null): AutomationExecution {
+        val execution = AutomationExecution(
+            id = id, automationId = rule.id, startedAt = startedAt,
+            completedAt = System.currentTimeMillis(), status = status,
+            triggerType = triggerType, contextId = rule.contextId, errorMessage = msg,
+        )
+        automationRepository.recordExecution(execution)
+        return execution
+    }
 }
 
-/** Map event to its trigger type for matching and recording. */
 fun TriggerEvent.toTriggerType(): TriggerType = when (this) {
     is TriggerEvent.Manual -> TriggerType.MANUAL
     is TriggerEvent.Time -> TriggerType.TIME
@@ -155,10 +138,18 @@ fun TriggerEvent.toTriggerType(): TriggerType = when (this) {
     is TriggerEvent.BluetoothDisconnected -> TriggerType.BLUETOOTH_DISCONNECTED
     is TriggerEvent.ChargingStarted -> TriggerType.CHARGING_STARTED
     is TriggerEvent.ChargingStopped -> TriggerType.CHARGING_STOPPED
-    is TriggerEvent.BatteryLevelChanged -> TriggerType.BATTERY_BELOW // Both battery types match
+    is TriggerEvent.BatteryLevelChanged -> TriggerType.BATTERY_BELOW
     is TriggerEvent.DeviceBoot -> TriggerType.DEVICE_BOOT
     is TriggerEvent.ScreenOn -> TriggerType.SCREEN_ON
     is TriggerEvent.ScreenOff -> TriggerType.SCREEN_OFF
     is TriggerEvent.DeviceIdle -> TriggerType.DEVICE_IDLE
     is TriggerEvent.DeviceActive -> TriggerType.DEVICE_ACTIVE
+    is TriggerEvent.NfcTagDetected -> TriggerType.NFC_TAG_DETECTED
+    is TriggerEvent.NfcTagRemoved -> TriggerType.NFC_TAG_REMOVED
+    is TriggerEvent.GeofenceEntered -> TriggerType.GEOFENCE_ENTER
+    is TriggerEvent.GeofenceExited -> TriggerType.GEOFENCE_EXIT
+    is TriggerEvent.CalendarEventStarted -> TriggerType.CALENDAR_EVENT_START
+    is TriggerEvent.CalendarEventEnded -> TriggerType.CALENDAR_EVENT_END
+    is TriggerEvent.NotificationPosted -> TriggerType.NOTIFICATION_POSTED
+    is TriggerEvent.NotificationRemoved -> TriggerType.NOTIFICATION_REMOVED
 }

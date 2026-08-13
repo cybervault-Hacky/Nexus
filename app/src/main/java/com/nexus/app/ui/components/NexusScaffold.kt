@@ -35,7 +35,10 @@ fun NexusScaffold() {
         currentRoute.startsWith("automation_detail") ||
         currentRoute.startsWith("automation_editor") ||
         currentRoute == Screen.AutomationHistory.route ||
-        currentRoute == Screen.EnvironmentSources.route
+        currentRoute == Screen.EnvironmentSources.route ||
+        currentRoute == Screen.PrivacySettings.route ||
+        currentRoute == Screen.EventDiagnostics.route ||
+        currentRoute == Screen.AutomationSimulator.route
 
     val showBottomBar = currentRoute in topLevelRoutes && !isSubScreen
 

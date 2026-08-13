@@ -10,13 +10,20 @@ import com.nexus.app.data.app.AppLauncher
 import com.nexus.app.data.app.InstalledAppDataSource
 import com.nexus.app.data.automation.AutomationScheduler
 import com.nexus.app.data.automation.AutomationSettingsImpl
+import com.nexus.app.data.automation.AutomationSimulator
+import com.nexus.app.data.automation.CompositeTriggerEvaluator
 import com.nexus.app.data.automation.EventDeduplicator
 import com.nexus.app.data.automation.TriggerEngine
 import com.nexus.app.data.automation.TriggerEventRouter
+import com.nexus.app.data.automation.capability.CapabilityManager
 import com.nexus.app.data.environment.battery.BatteryEventSource
 import com.nexus.app.data.environment.bluetooth.BluetoothEventSource
 import com.nexus.app.data.environment.boot.BootEventSource
+import com.nexus.app.data.environment.calendar.CalendarEventSource
 import com.nexus.app.data.environment.idle.IdleStateEventSource
+import com.nexus.app.data.environment.location.GeofenceRepositoryImpl
+import com.nexus.app.data.environment.nfc.NfcEventSource
+import com.nexus.app.data.environment.notification.NotificationEventSource
 import com.nexus.app.data.environment.power.PowerEventSource
 import com.nexus.app.data.environment.screen.ScreenEventSource
 import com.nexus.app.data.environment.wifi.WifiEventSource
@@ -26,6 +33,7 @@ import com.nexus.app.data.repository.AutomationRepositoryImpl
 import com.nexus.app.data.repository.CapsuleRepositoryImpl
 import com.nexus.app.data.repository.ContextAppRepositoryImpl
 import com.nexus.app.data.repository.ContextRepositoryImpl
+import com.nexus.app.data.repository.EventHistoryRepositoryImpl
 import com.nexus.app.data.repository.InstalledAppRepositoryImpl
 import com.nexus.app.data.restore.CapsuleRestoreEngine
 import com.nexus.app.data.restore.RestorePreviewEngine
@@ -43,36 +51,31 @@ import kotlinx.coroutines.SupervisorJob
 
 class NexusApplication : Application() {
 
-    lateinit var contextRepository: ContextRepository
-        private set
-    lateinit var contextAppRepository: ContextAppRepository
-        private set
-    lateinit var installedAppRepository: InstalledAppRepository
-        private set
-    lateinit var actionRepository: ActionRepository
-        private set
-    lateinit var capsuleRepository: CapsuleRepository
-        private set
-    lateinit var automationRepository: AutomationRepository
-        private set
-    lateinit var appLauncher: AppLauncher
-        private set
-    lateinit var workflowExecutor: WorkflowExecutor
-        private set
-    lateinit var restorePreviewEngine: RestorePreviewEngine
-        private set
-    lateinit var capsuleRestoreEngine: CapsuleRestoreEngine
-        private set
-    lateinit var triggerEngine: TriggerEngine
-        private set
-    lateinit var automationScheduler: AutomationScheduler
-        private set
-    lateinit var eventSourceRegistry: EnvironmentEventSourceRegistry
-        private set
-    lateinit var automationSettings: AutomationSettingsImpl
-        private set
-    lateinit var triggerEventRouter: TriggerEventRouter
-        private set
+    // Repositories
+    lateinit var contextRepository: ContextRepository; private set
+    lateinit var contextAppRepository: ContextAppRepository; private set
+    lateinit var installedAppRepository: InstalledAppRepository; private set
+    lateinit var actionRepository: ActionRepository; private set
+    lateinit var capsuleRepository: CapsuleRepository; private set
+    lateinit var automationRepository: AutomationRepository; private set
+    lateinit var eventHistoryRepository: EventHistoryRepositoryImpl; private set
+
+    // Engines
+    lateinit var appLauncher: AppLauncher; private set
+    lateinit var workflowExecutor: WorkflowExecutor; private set
+    lateinit var restorePreviewEngine: RestorePreviewEngine; private set
+    lateinit var capsuleRestoreEngine: CapsuleRestoreEngine; private set
+    lateinit var triggerEngine: TriggerEngine; private set
+    lateinit var automationScheduler: AutomationScheduler; private set
+    lateinit var eventSourceRegistry: EnvironmentEventSourceRegistry; private set
+    lateinit var automationSettings: AutomationSettingsImpl; private set
+    lateinit var triggerEventRouter: TriggerEventRouter; private set
+    lateinit var capabilityManager: CapabilityManager; private set
+    lateinit var geofenceRepository: GeofenceRepositoryImpl; private set
+    lateinit var automationSimulator: AutomationSimulator; private set
+    lateinit var nfcEventSource: NfcEventSource; private set
+    lateinit var calendarEventSource: CalendarEventSource; private set
+    lateinit var notificationEventSource: NotificationEventSource; private set
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -84,56 +87,32 @@ class NexusApplication : Application() {
 
         contextRepository = ContextRepositoryImpl(database.contextDao())
         installedAppRepository = InstalledAppRepositoryImpl(appDataSource)
-        contextAppRepository = ContextAppRepositoryImpl(
-            contextAppDao = database.contextAppDao(),
-            contextDao = database.contextDao(),
-            installedAppRepository = installedAppRepository,
-        )
+        contextAppRepository = ContextAppRepositoryImpl(database.contextAppDao(), database.contextDao(), installedAppRepository)
         appLauncher = AppLauncher(applicationContext)
+        actionRepository = ActionRepositoryImpl(database.actionDao(), database.contextDao())
+        capsuleRepository = CapsuleRepositoryImpl(database, database.capsuleDao(), database.capsuleAppDao(), database.capsuleActionDao(), database.contextDao(), database.contextAppDao(), database.actionDao())
+        automationRepository = AutomationRepositoryImpl(database.automationDao(), database.automationExecutionDao())
+        eventHistoryRepository = EventHistoryRepositoryImpl(database.eventHistoryDao())
 
-        actionRepository = ActionRepositoryImpl(
-            actionDao = database.actionDao(),
-            contextDao = database.contextDao(),
-        )
-
-        capsuleRepository = CapsuleRepositoryImpl(
-            database = database,
-            capsuleDao = database.capsuleDao(),
-            capsuleAppDao = database.capsuleAppDao(),
-            capsuleActionDao = database.capsuleActionDao(),
-            contextDao = database.contextDao(),
-            contextAppDao = database.contextAppDao(),
-            actionDao = database.actionDao(),
-        )
-
-        automationRepository = AutomationRepositoryImpl(
-            automationDao = database.automationDao(),
-            executionDao = database.automationExecutionDao(),
-        )
-
-        val actionExecutor = ActionExecutor(
-            handlers = mapOf(
-                ActionType.OPEN_APP to OpenAppHandler(appLauncher),
-                ActionType.OPEN_URL to OpenUrlHandler(applicationContext),
-                ActionType.DELAY to DelayHandler(),
-            )
-        )
+        val actionExecutor = ActionExecutor(mapOf(
+            ActionType.OPEN_APP to OpenAppHandler(appLauncher),
+            ActionType.OPEN_URL to OpenUrlHandler(applicationContext),
+            ActionType.DELAY to DelayHandler(),
+        ))
         workflowExecutor = WorkflowExecutor(actionExecutor)
-
         restorePreviewEngine = RestorePreviewEngine(installedAppRepository)
-        capsuleRestoreEngine = CapsuleRestoreEngine(
-            database = database,
-            contextDao = database.contextDao(),
-            contextAppDao = database.contextAppDao(),
-            actionDao = database.actionDao(),
-            installedAppRepository = installedAppRepository,
-        )
-
+        capsuleRestoreEngine = CapsuleRestoreEngine(database, database.contextDao(), database.contextAppDao(), database.actionDao(), installedAppRepository)
         triggerEngine = TriggerEngine(automationRepository, actionRepository, workflowExecutor)
         automationScheduler = AutomationScheduler(applicationContext)
 
-        // Phase 8: Environment event sources
+        // Phase 8 + 9: Environment event sources
         automationSettings = AutomationSettingsImpl(applicationContext)
+        capabilityManager = CapabilityManager(applicationContext)
+        geofenceRepository = GeofenceRepositoryImpl()
+        nfcEventSource = NfcEventSource(applicationContext)
+        calendarEventSource = CalendarEventSource(applicationContext)
+        notificationEventSource = NotificationEventSource(applicationContext)
+
         eventSourceRegistry = EnvironmentEventSourceRegistry().apply {
             register(WifiEventSource(applicationContext))
             register(BluetoothEventSource(applicationContext))
@@ -142,16 +121,15 @@ class NexusApplication : Application() {
             register(BootEventSource(applicationContext))
             register(ScreenEventSource(applicationContext))
             register(IdleStateEventSource(applicationContext))
+            register(nfcEventSource)
+            register(calendarEventSource)
+            register(notificationEventSource)
         }
         eventSourceRegistry.startEnabled()
 
-        // Start routing environment events to trigger engine
-        triggerEventRouter = TriggerEventRouter(
-            registry = eventSourceRegistry,
-            triggerEngine = triggerEngine,
-            deduplicator = EventDeduplicator(),
-            automationSettings = automationSettings,
-        )
+        automationSimulator = AutomationSimulator(triggerEngine, automationRepository)
+
+        triggerEventRouter = TriggerEventRouter(eventSourceRegistry, triggerEngine, EventDeduplicator(), automationSettings)
         triggerEventRouter.startRouting(appScope)
     }
 }
