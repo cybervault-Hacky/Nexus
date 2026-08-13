@@ -36,9 +36,8 @@ import com.nexus.app.domain.model.NexusContext
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * A reusable card representing a [NexusContext].
- * Shows the context name, icon, stats, and active/inactive state.
- * Designed so Phase 3 can add real app counts without rewriting.
+ * Premium context card.
+ * Clean layout, strong hierarchy, elegant accent treatment.
  */
 @Composable
 fun ContextCard(
@@ -48,7 +47,7 @@ fun ContextCard(
 ) {
     val accent = Color(context.accentColor)
     val animatedAccent by animateColorAsState(
-        targetValue = if (context.isActive) accent else accent.copy(alpha = 0.4f),
+        targetValue = if (context.isActive) accent else accent.copy(alpha = 0.35f),
         animationSpec = tween(400),
         label = "contextAccent",
     )
@@ -68,17 +67,16 @@ fun ContextCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Icon
-                    Icon(
-                        imageVector = contextIconFor(context.iconId),
-                        contentDescription = null,
-                        tint = animatedAccent,
-                        modifier = Modifier.size(20.dp),
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(animatedAccent),
                     )
                     Spacer(Modifier.width(NexusSpacing.sm))
                     Text(
                         text = context.name,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -87,13 +85,13 @@ fun ContextCard(
                 if (context.isActive) {
                     StatusBadge(
                         text = stringResource(R.string.contexts_active),
-                        backgroundColor = accent.copy(alpha = 0.15f),
+                        backgroundColor = accent.copy(alpha = 0.12f),
                         textColor = accent,
                     )
                 }
             }
 
-            Spacer(Modifier.height(NexusSpacing.xs))
+            Spacer(Modifier.height(NexusSpacing.sm))
 
             Text(
                 text = context.description.ifBlank { "No description" },
@@ -111,15 +109,15 @@ fun ContextCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "${context.appCount} apps  •  ${context.actionCount} actions",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "${context.appCount} apps  ·  ${context.actionCount} actions",
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                     contentDescription = stringResource(R.string.home_open),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }

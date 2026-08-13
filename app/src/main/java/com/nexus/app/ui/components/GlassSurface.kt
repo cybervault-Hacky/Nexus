@@ -15,16 +15,16 @@ import androidx.compose.ui.unit.dp
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * A subtle translucent surface used as the foundational card
- * style throughout NEXUS. Gives depth without heavy drop-shadows.
+ * Premium surface card — the foundational container throughout NEXUS.
+ * Subtle translucency with refined borders. Not flashy — elegant.
  */
 @Composable
 fun GlassSurface(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = NexusSpacing.md,
     contentPadding: Dp = NexusSpacing.cardPadding,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
-    borderColor: Color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+    borderColor: Color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
     content: @Composable BoxScope.() -> Unit,
 ) {
     val shape = MaterialTheme.shapes.medium
@@ -32,7 +32,7 @@ fun GlassSurface(
         modifier = modifier
             .clip(shape)
             .background(containerColor, shape)
-            .border(1.dp, borderColor, shape)
+            .border(0.5.dp, borderColor, shape)
             .padding(contentPadding),
         content = content,
     )

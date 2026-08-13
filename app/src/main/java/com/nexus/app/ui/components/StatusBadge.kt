@@ -12,14 +12,13 @@ import androidx.compose.ui.graphics.Color
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * Small pill-shaped badge used to show status like "Active"
- * or version numbers. Accepts a custom [color] for the background.
+ * Premium pill badge for status indicators.
  */
 @Composable
 fun StatusBadge(
     text: String,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+    backgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
     textColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     Box(

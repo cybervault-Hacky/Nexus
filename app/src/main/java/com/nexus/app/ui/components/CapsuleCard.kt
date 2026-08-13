@@ -39,8 +39,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * A reusable card representing a [NexusCapsule].
- * Displays name, app/action counts from the snapshot, and capture time.
+ * Premium capsule card — snapshot indicator with clean layout.
  */
 @Composable
 fun CapsuleCard(
@@ -72,14 +71,14 @@ fun CapsuleCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(10.dp)
+                            .size(8.dp)
                             .clip(CircleShape)
                             .background(accent),
                     )
                     Spacer(Modifier.width(NexusSpacing.sm))
                     Text(
                         text = capsule.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -105,22 +104,21 @@ fun CapsuleCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "${capsule.appCount} Apps  •  ${capsule.actionCount} Actions  •  $relativeTime",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "${capsule.appCount} apps  ·  ${capsule.actionCount} actions  ·  $relativeTime",
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                     contentDescription = stringResource(R.string.capsules_restore),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
     }
 }
 
-/** Converts a timestamp into a human-friendly relative string. */
 private fun formatRelativeTime(timestamp: Long): String {
     val diff = System.currentTimeMillis() - timestamp
     val minutes = diff / 60_000

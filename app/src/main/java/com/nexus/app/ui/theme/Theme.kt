@@ -19,16 +19,16 @@ import com.nexus.app.domain.model.ThemeMode
 // ── Dark colour scheme ──────────────────────────────────────
 private val DarkColorScheme = darkColorScheme(
     primary = NexusPrimary,
-    onPrimary = Color(0xFF1A1A2E),
+    onPrimary = Color(0xFFFFFFFF),
     primaryContainer = NexusPrimaryDark,
     onPrimaryContainer = NexusPrimaryLight,
     secondary = NexusSecondary,
-    onSecondary = Color(0xFF003344),
-    secondaryContainer = Color(0xFF004D60),
-    onSecondaryContainer = Color(0xFF97F0FF),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFF0D3B54),
+    onSecondaryContainer = Color(0xFFB3E5FC),
     tertiary = NexusTertiary,
-    onTertiary = Color(0xFF2D1B4E),
-    tertiaryContainer = Color(0xFF443370),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFF3D2B6B),
     onTertiaryContainer = Color(0xFFD4BBFF),
     background = DarkBackground,
     onBackground = DarkOnBackground,
@@ -39,19 +39,19 @@ private val DarkColorScheme = darkColorScheme(
     outline = DarkOutline,
     outlineVariant = DarkBorder,
     error = NexusError,
-    onError = Color(0xFF420000),
+    onError = Color(0xFFFFFFFF),
 )
 
 // ── Light colour scheme ─────────────────────────────────────
 private val LightColorScheme = lightColorScheme(
     primary = NexusPrimaryDark,
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFE0E0FF),
-    onPrimaryContainer = Color(0xFF1A1A5E),
-    secondary = Color(0xFF0891B2),
+    primaryContainer = Color(0xFFEDE9FE),
+    onPrimaryContainer = Color(0xFF2D1B6B),
+    secondary = Color(0xFF0284C7),
     onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFCFFAFE),
-    onSecondaryContainer = Color(0xFF003344),
+    secondaryContainer = Color(0xFFE0F2FE),
+    onSecondaryContainer = Color(0xFF0C4A6E),
     tertiary = Color(0xFF7C3AED),
     onTertiary = Color(0xFFFFFFFF),
     tertiaryContainer = Color(0xFFEDE9FE),
@@ -68,21 +68,11 @@ private val LightColorScheme = lightColorScheme(
     onError = Color(0xFFFFFFFF),
 )
 
-/**
- * Global singleton for the current theme mode.
- * A simple StateHolder is sufficient for Phase 1;
- * a DataStore-backed implementation will replace this later.
- */
 object NexusThemeState {
     var themeMode by mutableStateOf(ThemeMode.DARK)
     var animationsEnabled by mutableStateOf(true)
 }
 
-/**
- * NEXUS theme wrapper.
- * Applies the correct colour scheme based on [NexusThemeState.themeMode]
- * and sets system-bar colours to match.
- */
 @Composable
 fun NexusTheme(
     themeMode: ThemeMode = NexusThemeState.themeMode,

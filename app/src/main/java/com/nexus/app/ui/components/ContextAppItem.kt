@@ -35,9 +35,7 @@ import com.nexus.app.domain.model.InstalledApp
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * A single app row within the Context Detail screen.
- * Shows real app icon, name, and a remove button.
- * Displays a warning state if the app is no longer installed.
+ * Premium app item — clean icon, name, remove control.
  */
 @Composable
 fun ContextAppItem(
@@ -60,13 +58,10 @@ fun ContextAppItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // App icon
             if (isInstalled) {
                 val iconDrawable: Drawable? = try {
                     context.packageManager.getApplicationIcon(app.packageName)
-                } catch (_: Exception) {
-                    null
-                }
+                } catch (_: Exception) { null }
                 if (iconDrawable != null) {
                     Image(
                         bitmap = iconDrawable.toBitmap(40, 40).asImageBitmap(),
@@ -89,7 +84,7 @@ fun ContextAppItem(
 
             Spacer(Modifier.width(NexusSpacing.md))
 
-            Column(modifier = Modifier.weight(1f)) {
+            androidx.compose.foundation.layout.Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = app.appName,
                     style = MaterialTheme.typography.bodyLarge,
@@ -115,7 +110,7 @@ fun ContextAppItem(
                     imageVector = Icons.Outlined.Close,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(18.dp),
                 )
             }
         }

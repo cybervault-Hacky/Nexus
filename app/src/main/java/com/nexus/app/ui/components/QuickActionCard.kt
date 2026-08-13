@@ -29,8 +29,7 @@ import com.nexus.app.domain.model.QuickAction
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * A circular icon button with label used in the Quick Actions grid.
- * Provides tactile press feedback via scale animation.
+ * Premium quick action button — subtle press feedback.
  */
 @Composable
 fun QuickActionCard(
@@ -42,7 +41,7 @@ fun QuickActionCard(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else 1f,
+        targetValue = if (isPressed) 0.95f else 1f,
         animationSpec = tween(100),
         label = "actionPress",
     )
@@ -65,10 +64,10 @@ fun QuickActionCard(
             contentPadding = NexusSpacing.base,
         ) {
             Icon(
-                imageVector = action.icon(),
+                imageVector = action.icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(24.dp),
             )
         }
 

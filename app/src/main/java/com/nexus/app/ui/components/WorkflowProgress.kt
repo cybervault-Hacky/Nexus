@@ -29,7 +29,7 @@ import com.nexus.app.domain.model.WorkflowState
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * Displays the progress of a running workflow.
+ * Premium workflow progress indicator.
  */
 @Composable
 fun WorkflowProgress(
@@ -45,11 +45,11 @@ fun WorkflowProgress(
         GlassSurface(
             modifier = modifier.fillMaxWidth(),
             borderColor = when (state) {
-                is WorkflowState.Running -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                is WorkflowState.Completed -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                is WorkflowState.Failed -> MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                is WorkflowState.Cancelled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                is WorkflowState.Running -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                is WorkflowState.Completed -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                is WorkflowState.Failed -> MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
+                is WorkflowState.Cancelled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+                else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
             },
         ) {
             Column {
@@ -57,7 +57,7 @@ fun WorkflowProgress(
                     is WorkflowState.Running -> {
                         Text(
                             text = "Running workflow",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(Modifier.height(NexusSpacing.sm))
@@ -69,13 +69,11 @@ fun WorkflowProgress(
                         Spacer(Modifier.height(NexusSpacing.sm))
                         LinearProgressIndicator(
                             progress = {
-                                if (state.totalCount > 0)
-                                    (state.completedCount.toFloat()) / state.totalCount
-                                else 0f
+                                if (state.totalCount > 0) (state.completedCount.toFloat()) / state.totalCount else 0f
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(4.dp)
+                                .height(3.dp)
                                 .clip(MaterialTheme.shapes.extraSmall),
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -87,63 +85,30 @@ fun WorkflowProgress(
                     }
                     is WorkflowState.Completed -> {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Filled.CheckCircle,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp),
-                            )
+                            Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(NexusSpacing.sm))
-                            Text(
-                                text = "Workflow completed: ${state.result.completedCount}/${state.result.totalCount}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
+                            Text("Workflow completed: ${state.result.completedCount}/${state.result.totalCount}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Spacer(Modifier.height(NexusSpacing.sm))
-                        TextButton(onClick = onDismiss) {
-                            Text("Dismiss")
-                        }
+                        TextButton(onClick = onDismiss) { Text("Dismiss") }
                     }
                     is WorkflowState.Failed -> {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(20.dp),
-                            )
+                            Icon(Icons.Filled.Close, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(NexusSpacing.sm))
-                            Text(
-                                text = "Workflow stopped: ${state.result.completedCount}/${state.result.totalCount}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.error,
-                            )
+                            Text("Workflow stopped: ${state.result.completedCount}/${state.result.totalCount}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.error)
                         }
                         Spacer(Modifier.height(NexusSpacing.sm))
-                        TextButton(onClick = onDismiss) {
-                            Text("Dismiss")
-                        }
+                        TextButton(onClick = onDismiss) { Text("Dismiss") }
                     }
                     is WorkflowState.Cancelled -> {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Outlined.Cancel,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp),
-                            )
+                            Icon(Icons.Outlined.Cancel, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(NexusSpacing.sm))
-                            Text(
-                                text = "Workflow cancelled: ${state.result.completedCount}/${state.result.totalCount}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            Text("Workflow cancelled: ${state.result.completedCount}/${state.result.totalCount}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Spacer(Modifier.height(NexusSpacing.sm))
-                        TextButton(onClick = onDismiss) {
-                            Text("Dismiss")
-                        }
+                        TextButton(onClick = onDismiss) { Text("Dismiss") }
                     }
                     else -> {}
                 }

@@ -5,8 +5,9 @@ import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
 
 /**
- * NEXUS shape tokens.
- * Consistent, slightly rounded corners for a soft-futuristic feel.
+ * NEXUS Shape Tokens
+ *
+ * Soft, consistent rounded corners. Premium feel without being bubbly.
  */
 val NexusShapes = Shapes(
     extraSmall = RoundedCornerShape(6.dp),

@@ -1,6 +1,5 @@
 package com.nexus.app.ui.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,8 +33,7 @@ import com.nexus.app.domain.model.NexusAction
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * A single action row within the Context Detail screen.
- * Shows action name, type, enabled state, and controls.
+ * Premium action item — clean layout with clear controls.
  */
 @Composable
 fun ActionItem(
@@ -65,7 +63,6 @@ fun ActionItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                // Position number
                 Text(
                     text = "${index + 1}",
                     style = MaterialTheme.typography.labelMedium,
@@ -89,7 +86,6 @@ fun ActionItem(
                     )
                 }
 
-                // Enabled toggle
                 Switch(
                     checked = action.isEnabled,
                     onCheckedChange = onToggleEnabled,
@@ -104,18 +100,16 @@ fun ActionItem(
 
             Spacer(Modifier.height(NexusSpacing.sm))
 
-            // Controls row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                // Move up/down
                 IconButton(onClick = onMoveUp, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                         contentDescription = "Move up",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                     )
                 }
                 IconButton(onClick = onMoveDown, modifier = Modifier.size(32.dp)) {
@@ -123,13 +117,12 @@ fun ActionItem(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                         contentDescription = "Move down",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                     )
                 }
 
                 Spacer(Modifier.weight(1f))
 
-                // Run
                 IconButton(
                     onClick = onRun,
                     modifier = Modifier
@@ -140,27 +133,25 @@ fun ActionItem(
                         imageVector = Icons.Outlined.PlayArrow,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                     )
                 }
 
-                // Edit
                 IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
                         contentDescription = "Edit",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                     )
                 }
 
-                // Delete
                 IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = "Delete",
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                     )
                 }
             }

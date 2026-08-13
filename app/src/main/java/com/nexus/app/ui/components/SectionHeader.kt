@@ -13,8 +13,7 @@ import androidx.compose.ui.Modifier
 import com.nexus.app.ui.theme.NexusSpacing
 
 /**
- * Reusable section header with an optional trailing action.
- * Used across all screens for visual consistency.
+ * Premium section header with optional trailing action.
  */
 @Composable
 fun SectionHeader(
@@ -32,7 +31,7 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
         if (actionLabel != null && onAction != null) {

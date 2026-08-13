@@ -127,16 +127,16 @@ private fun EmptyContextsState(
     ) {
         Text(
             text = "No contexts yet",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(Modifier.height(NexusSpacing.sm))
+        Spacer(Modifier.height(NexusSpacing.md))
         Text(
-            text = "Create your first context to start organizing your workflow.",
-            style = MaterialTheme.typography.bodyMedium,
+            text = "Create your first environment to get started.",
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(NexusSpacing.xl))
+        Spacer(Modifier.height(NexusSpacing.xxl))
         FloatingActionButton(
             onClick = onCreateClick,
             containerColor = MaterialTheme.colorScheme.primary,

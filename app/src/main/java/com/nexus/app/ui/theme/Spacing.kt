@@ -3,9 +3,10 @@ package com.nexus.app.ui.theme
 import androidx.compose.ui.unit.dp
 
 /**
- * Centralised spacing tokens used across the NEXUS UI.
- * Keeping these in one place guarantees visual consistency
- * and makes global layout adjustments trivial.
+ * NEXUS Spacing Tokens
+ *
+ * Generous whitespace for a premium, breathable feel.
+ * Consistent rhythm across all screens.
  */
 object NexusSpacing {
     val xxs = 2.dp
@@ -18,8 +19,8 @@ object NexusSpacing {
     val xxl = 32.dp
     val xxxl = 40.dp
     val xxxxl = 48.dp
-    val cardPadding = 16.dp
-    val screenPadding = 20.dp
-    val sectionGap = 28.dp
-    val itemGap = 12.dp
+    val cardPadding = 18.dp
+    val screenPadding = 22.dp
+    val sectionGap = 32.dp
+    val itemGap = 14.dp
 }

@@ -18,8 +18,7 @@ import com.nexus.app.R
 import com.nexus.app.ui.navigation.Screen
 
 /**
- * The primary bottom navigation bar for NEXUS.
- * Visibility is controlled by the parent [NexusScaffold].
+ * Premium bottom navigation — minimal, refined.
  */
 @Composable
 fun NexusBottomBar(
@@ -28,8 +27,8 @@ fun NexusBottomBar(
     modifier: Modifier = Modifier,
 ) {
     NavigationBar(
-        modifier = modifier.height(64.dp),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+        modifier = modifier.height(60.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 0.dp,
     ) {
@@ -58,7 +57,7 @@ fun NexusBottomBar(
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
                 ),
                 modifier = Modifier.semantics { contentDescription = tabDescription },
             )

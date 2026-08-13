@@ -3,46 +3,51 @@ package com.nexus.app.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Centralised colour tokens for the NEXUS design system.
- * Grouped by role rather than by screen so that every composable
- * references the same semantic palette.
+ * NEXUS Premium Color System
+ *
+ * A neutral-first palette inspired by premium product design.
+ * Restrained accent usage, strong text contrast, sophisticated surfaces.
  */
 
-// ── Brand ───────────────────────────────────────────────────
-val NexusPrimary = Color(0xFF818CF8)          // Indigo-400
-val NexusPrimaryDark = Color(0xFF6366F1)      // Indigo-500
-val NexusPrimaryLight = Color(0xFFA5B4FC)     // Indigo-300
-val NexusSecondary = Color(0xFF22D3EE)        // Cyan-400
-val NexusTertiary = Color(0xFFA78BFA)         // Violet-400
+// ── Brand Accent ─────────────────────────────────────────────
+// A refined indigo — elegant without being loud
+val NexusPrimary = Color(0xFF6C5CE7)          // Soft violet-indigo
+val NexusPrimaryDark = Color(0xFF5A4BD1)      // Deeper variant
+val NexusPrimaryLight = Color(0xFF9B8FFA)     // Lighter variant
+val NexusSecondary = Color(0xFF0EA5E9)        // Muted sky blue
+val NexusTertiary = Color(0xFF8B5CF6)         // Soft violet
 
-// ── Dark surface tokens ─────────────────────────────────────
-val DarkBackground = Color(0xFF0A0A0F)
-val DarkSurface = Color(0xFF13131A)
-val DarkSurfaceVariant = Color(0xFF1C1C27)
-val DarkSurfaceElevated = Color(0xFF22222F)
-val DarkOnBackground = Color(0xFFE8E8ED)
-val DarkOnSurface = Color(0xFFD1D1D9)
-val DarkOnSurfaceVariant = Color(0xFF8E8E99)
-val DarkOutline = Color(0xFF2E2E3A)
-val DarkBorder = Color(0xFF2A2A36)
+// ── Dark Mode Surfaces ───────────────────────────────────────
+// Deep, warm neutrals — not pure black
+val DarkBackground = Color(0xFF0F0F14)
+val DarkSurface = Color(0xFF17171E)
+val DarkSurfaceVariant = Color(0xFF1E1E28)
+val DarkSurfaceElevated = Color(0xFF252530)
+val DarkOnBackground = Color(0xFFEAEAEE)
+val DarkOnSurface = Color(0xFFD4D4DA)
+val DarkOnSurfaceVariant = Color(0xFF8A8A96)
+val DarkOutline = Color(0xFF2C2C38)
+val DarkBorder = Color(0xFF28283A)
 
-// ── Light surface tokens ────────────────────────────────────
-val LightBackground = Color(0xFFF8F8FC)
+// ── Light Mode Surfaces ──────────────────────────────────────
+// Clean, warm whites — not clinical
+val LightBackground = Color(0xFFF6F6FA)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF0F0F6)
+val LightSurfaceVariant = Color(0xFFF0F0F5)
 val LightSurfaceElevated = Color(0xFFFFFFFF)
 val LightOnBackground = Color(0xFF111118)
-val LightOnSurface = Color(0xFF1C1C24)
-val LightOnSurfaceVariant = Color(0xFF6B6B78)
-val LightOutline = Color(0xFFDDDDDF)
-val LightBorder = Color(0xFFE5E5EA)
+val LightOnSurface = Color(0xFF1A1A24)
+val LightOnSurfaceVariant = Color(0xFF6E6E80)
+val LightOutline = Color(0xFFE0E0E6)
+val LightBorder = Color(0xFFE8E8EE)
 
-// ── Semantic colours (shared) ───────────────────────────────
-val NexusSuccess = Color(0xFF34D399)
-val NexusWarning = Color(0xFFFBBF24)
-val NexusError = Color(0xFFF87171)
-val NexusInfo = Color(0xFF60A5FA)
+// ── Semantic Colors ──────────────────────────────────────────
+// Reserved strictly for meaning — never decorative
+val NexusSuccess = Color(0xFF22C55E)
+val NexusWarning = Color(0xFFF59E0B)
+val NexusError = Color(0xFFEF4444)
+val NexusInfo = Color(0xFF3B82F6)
 
-// ── Glass surface overlay ───────────────────────────────────
-val DarkGlassSurface = Color(0x14FFFFFF)   // ~8% white overlay
-val LightGlassSurface = Color(0x0A000000)  // ~4% black overlay
+// ── Surface Overlays ─────────────────────────────────────────
+val DarkGlassSurface = Color(0x0DFFFFFF)    // Subtle 5% white
+val LightGlassSurface = Color(0x08000000)   // Subtle 3% black

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,8 +37,8 @@ import com.nexus.app.ui.theme.NexusSpacing
 import kotlinx.coroutines.delay
 
 /**
- * Home Dashboard — the default landing screen.
- * Shows the active context, recent capsules, and quick actions.
+ * NEXUS Home Dashboard — premium, spacious, informative.
+ * Communicates: "What is active? What is happening? What can I do?"
  */
 @Composable
 fun HomeScreen(
@@ -51,22 +50,21 @@ fun HomeScreen(
     activeAutomationCount: Int = 0,
     modifier: Modifier = Modifier,
 ) {
-    // Staggered entrance animation
     var showGreeting by remember { mutableStateOf(false) }
     var showContext by remember { mutableStateOf(false) }
     var showCapsules by remember { mutableStateOf(false) }
     var showActions by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        showGreeting = true; delay(80)
-        showContext = true; delay(80)
-        showCapsules = true; delay(80)
+        showGreeting = true; delay(60)
+        showContext = true; delay(60)
+        showCapsules = true; delay(60)
         showActions = true
     }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = NexusSpacing.lg),
+        contentPadding = PaddingValues(bottom = NexusSpacing.xxl),
     ) {
         // ── Header ───────────────────────────────────────────
         item {
@@ -74,24 +72,24 @@ fun HomeScreen(
                 modifier = Modifier.padding(
                     start = NexusSpacing.screenPadding,
                     end = NexusSpacing.screenPadding,
-                    top = NexusSpacing.xxl,
+                    top = NexusSpacing.xxxl,
                 ),
             ) {
                 AnimatedVisibility(
                     visible = showGreeting,
-                    enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 },
+                    enter = fadeIn(tween(350)) + slideInVertically(tween(350)) { it / 6 },
                 ) {
                     Column {
                         Text(
-                            text = "NEXUS",
-                            style = MaterialTheme.typography.displayMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            text = greetingText(),
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                         Spacer(Modifier.height(NexusSpacing.xs))
                         Text(
-                            text = greetingText(),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            text = "NEXUS",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -102,7 +100,7 @@ fun HomeScreen(
         item {
             AnimatedVisibility(
                 visible = showContext,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 },
+                enter = fadeIn(tween(350)) + slideInVertically(tween(350)) { it / 6 },
             ) {
                 Column(
                     modifier = Modifier.padding(top = NexusSpacing.sectionGap),
@@ -134,7 +132,7 @@ fun HomeScreen(
         item {
             AnimatedVisibility(
                 visible = showCapsules,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 },
+                enter = fadeIn(tween(350)) + slideInVertically(tween(350)) { it / 6 },
             ) {
                 Column(
                     modifier = Modifier.padding(top = NexusSpacing.sectionGap),
@@ -153,7 +151,7 @@ fun HomeScreen(
             item {
                 AnimatedVisibility(
                     visible = showCapsules,
-                    enter = fadeIn(tween(500)) + slideInVertically(tween(500)) { it / 4 },
+                    enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 6 },
                 ) {
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = NexusSpacing.screenPadding),
@@ -174,11 +172,11 @@ fun HomeScreen(
             }
         }
 
-        // ── Automations ────────────────────────────────────
+        // ── Automations ──────────────────────────────────────
         item {
             AnimatedVisibility(
                 visible = showActions,
-                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 },
+                enter = fadeIn(tween(350)) + slideInVertically(tween(350)) { it / 6 },
             ) {
                 Column(
                     modifier = Modifier.padding(top = NexusSpacing.sectionGap),
@@ -190,7 +188,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(horizontal = NexusSpacing.screenPadding),
                     )
                     Text(
-                        text = if (activeAutomationCount > 0) "$activeAutomationCount active automations" else "No active automations",
+                        text = if (activeAutomationCount > 0) "$activeAutomationCount active" else "No active automations",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = NexusSpacing.screenPadding),
@@ -203,7 +201,7 @@ fun HomeScreen(
         item {
             AnimatedVisibility(
                 visible = showActions,
-                enter = fadeIn(tween(450)) + slideInVertically(tween(450)) { it / 4 },
+                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 6 },
             ) {
                 Column(
                     modifier = Modifier.padding(top = NexusSpacing.sectionGap),
@@ -219,7 +217,7 @@ fun HomeScreen(
         item {
             AnimatedVisibility(
                 visible = showActions,
-                enter = fadeIn(tween(500)) + slideInVertically(tween(500)) { it / 4 },
+                enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 6 },
             ) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = NexusSpacing.screenPadding),
@@ -238,12 +236,10 @@ fun HomeScreen(
             }
         }
 
-        // Bottom spacer
         item { Spacer(Modifier.height(NexusSpacing.lg)) }
     }
 }
 
-/** Returns a time-appropriate greeting. */
 private fun greetingText(): String {
     val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
     return when {
