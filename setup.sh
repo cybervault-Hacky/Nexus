@@ -1,5 +1,6 @@
 #!/bin/bash
 # NEXUS Development Setup Script
+# Generates Gradle wrapper if missing, then builds the project.
 
 set -e
 
@@ -7,7 +8,8 @@ echo "=== NEXUS Development Setup ==="
 
 # Check Java
 if ! command -v java &> /dev/null; then
-    echo "ERROR: Java not found. Install JDK 17."
+    echo "ERROR: Java 17+ required but not found."
+    echo "Install JDK 17: https://adoptium.net/"
     exit 1
 fi
 
@@ -18,27 +20,26 @@ if [ "$JAVA_VERSION" -lt 17 ]; then
 fi
 echo "✓ JDK $JAVA_VERSION found"
 
-# Check Android SDK
-if [ -z "$ANDROID_HOME" ] && [ -z "$ANDROID_SDK_ROOT" ]; then
-    echo "WARNING: ANDROID_HOME/ANDROID_SDK_ROOT not set."
-    echo "  Set it to your Android SDK path."
-fi
-echo "✓ Android SDK check passed"
-
 # Generate Gradle wrapper if missing
 if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-    echo "Generating Gradle wrapper..."
+    echo "Gradle wrapper JAR missing — generating..."
     if command -v gradle &> /dev/null; then
         gradle wrapper --gradle-version 8.5
         echo "✓ Gradle wrapper generated"
     else
-        echo "WARNING: Gradle not found. Install Gradle or run 'gradle wrapper' manually."
+        echo "ERROR: Gradle not found and wrapper JAR is missing."
+        echo "Install Gradle or clone the repository with the wrapper JAR."
+        echo ""
+        echo "To install Gradle:"
+        echo "  brew install gradle        # macOS"
+        echo "  sdk install gradle 8.5     # SDKMAN"
+        echo "  apt install gradle         # Debian/Ubuntu"
+        exit 1
     fi
 else
     echo "✓ Gradle wrapper exists"
 fi
 
-# Make gradlew executable
 chmod +x gradlew
 echo "✓ gradlew is executable"
 
@@ -50,7 +51,7 @@ echo ""
 echo "✓ Build complete!"
 echo ""
 echo "Artifacts:"
-echo "  Debug APK: app/build/outputs/apk/debug/"
+echo "  Debug APK:   app/build/outputs/apk/debug/"
 echo ""
 echo "To build release: ./gradlew assembleRelease"
 echo "To build AAB:     ./gradlew bundleRelease"
