@@ -39,7 +39,7 @@ object AutomationValidation {
             TriggerType.GEOFENCE_ENTER, TriggerType.GEOFENCE_EXIT -> validateGeofencePayload(payload)
             TriggerType.CALENDAR_EVENT_START, TriggerType.CALENDAR_EVENT_END -> null
             TriggerType.NOTIFICATION_POSTED -> null
-            TriggerType.ALL_CONDITIONS, TriggerType.ANY_CONDITION -> CompositeTriggerEvaluator.validate(payload)
+            TriggerType.ALL_CONDITIONS, TriggerType.ANY_CONDITION -> validateCompositePayload(payload)
             else -> null // Simple triggers
         }
     }
@@ -99,5 +99,19 @@ object AutomationValidation {
             if (radius > 50000) return "Radius too large (max 50km)"
             null
         } catch (_: Exception) { "Invalid geofence configuration" }
+    }
+
+    private fun validateCompositePayload(payload: String): String? {
+        return try {
+            val obj = JSONObject(payload)
+            val operator = obj.optString("operator", "")
+            if (operator != "ALL" && operator != "ANY") return "Operator must be ALL or ANY"
+            val children = obj.optJSONArray("childConditions")
+            if (children == null || children.length() == 0) return "Must contain at least one condition"
+            if (children.length() > 10) return "Too many conditions (max 10)"
+            null
+        } catch (_: Exception) {
+            "Invalid composite configuration"
+        }
     }
 }

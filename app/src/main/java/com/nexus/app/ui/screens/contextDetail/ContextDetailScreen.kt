@@ -260,6 +260,7 @@ fun ContextDetailScreen(
                             viewModel = viewModel,
                             onEdit = { onNavigateToEdit(contextId) },
                             onDelete = { showDeleteDialog = true },
+                            onCaptureCapsule = { onNavigateToCaptureCapsule(contextId) },
                         )
                     }
                 }
@@ -554,6 +555,7 @@ private fun DetailActions(
     viewModel: ContextViewModel,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onCaptureCapsule: () -> Unit,
 ) {
     GlassSurface {
         Column {
@@ -610,7 +612,7 @@ private fun DetailActions(
             ActionRow(
                 label = "Save as Capsule",
                 description = "Capture this context as a reusable snapshot",
-                onClick = { onNavigateToCaptureCapsule(context.id) },
+                onClick = onCaptureCapsule,
                 icon = Icons.Outlined.Save,
             )
 
