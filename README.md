@@ -79,6 +79,17 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+### Workflow Files
+
+Due to GitHub App permission restrictions, workflow files must be added manually. Create `.github/workflows/android-ci.yml` and `.github/workflows/android-release.yml` with the content from the repository's `.github/release-template.md`.
+
+To add workflow files:
+1. Go to your repository on GitHub
+2. Navigate to `.github/workflows/`
+3. Create `android-ci.yml` with CI configuration
+4. Create `android-release.yml` with release configuration
+5. Commit and push
+
 ## Versioning
 
 - `versionCode`: Integer, incremented for each release
