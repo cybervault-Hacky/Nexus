@@ -32,10 +32,24 @@ object AutomationValidation {
 
     fun validateTriggerPayload(triggerType: TriggerType, payload: String): String? {
         return when (triggerType) {
+            // Phase 7
             TriggerType.MANUAL -> null
             TriggerType.TIME -> validateTimePayload(payload)
             TriggerType.APP_OPEN, TriggerType.APP_CLOSE -> validateAppPayload(payload)
             TriggerType.CONTEXT_ACTIVATED -> validateContextPayload(payload)
+            // Phase 8 — simple/no payload
+            TriggerType.WIFI_CONNECTED -> null
+            TriggerType.WIFI_DISCONNECTED -> null
+            TriggerType.BLUETOOTH_CONNECTED -> null
+            TriggerType.BLUETOOTH_DISCONNECTED -> null
+            TriggerType.CHARGING_STARTED -> null
+            TriggerType.CHARGING_STOPPED -> null
+            TriggerType.BATTERY_BELOW, TriggerType.BATTERY_ABOVE -> validateBatteryPayload(payload)
+            TriggerType.DEVICE_BOOT -> null
+            TriggerType.SCREEN_ON -> null
+            TriggerType.SCREEN_OFF -> null
+            TriggerType.DEVICE_IDLE -> null
+            TriggerType.DEVICE_ACTIVE -> null
         }
     }
 
@@ -85,6 +99,17 @@ object AutomationValidation {
             null
         } catch (_: Exception) {
             "Invalid context configuration"
+        }
+    }
+
+    private fun validateBatteryPayload(payload: String): String? {
+        return try {
+            val obj = JSONObject(payload)
+            val threshold = obj.optInt("thresholdPercent", -1)
+            if (threshold < 0 || threshold > 100) return "Threshold must be 0–100%"
+            null
+        } catch (_: Exception) {
+            "Invalid battery configuration"
         }
     }
 }

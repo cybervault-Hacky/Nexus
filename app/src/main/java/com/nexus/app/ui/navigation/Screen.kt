@@ -132,6 +132,11 @@ sealed class Screen(
         const val route = "automation_history"
     }
 
+    /** Environment trigger sources */
+    data object EnvironmentSources {
+        const val route = "environment_sources"
+    }
+
     companion object {
         /** Ordered list of screens shown in the bottom nav bar. */
         val bottomNavItems = listOf(Home, Contexts, Capsules, Actions, Automations, Settings)

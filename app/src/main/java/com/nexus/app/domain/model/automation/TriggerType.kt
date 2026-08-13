@@ -5,14 +5,25 @@ package com.nexus.app.domain.model.automation
  * Designed extensible — add new types without modifying existing handlers.
  */
 enum class TriggerType {
-    /** User manually runs the automation. */
+    // ── Phase 7 triggers ─────────────────────────────────────
     MANUAL,
-    /** Fires at a specific time on selected days. */
     TIME,
-    /** Fires when a specific app is opened. */
     APP_OPEN,
-    /** Fires when a specific app is closed. */
     APP_CLOSE,
-    /** Fires when a specific context is activated. */
     CONTEXT_ACTIVATED,
+
+    // ── Phase 8 environment triggers ─────────────────────────
+    WIFI_CONNECTED,
+    WIFI_DISCONNECTED,
+    BLUETOOTH_CONNECTED,
+    BLUETOOTH_DISCONNECTED,
+    CHARGING_STARTED,
+    CHARGING_STOPPED,
+    BATTERY_BELOW,
+    BATTERY_ABOVE,
+    DEVICE_BOOT,
+    SCREEN_ON,
+    SCREEN_OFF,
+    DEVICE_IDLE,
+    DEVICE_ACTIVE,
 }

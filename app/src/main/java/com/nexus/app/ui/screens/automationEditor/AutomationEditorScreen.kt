@@ -74,6 +74,7 @@ fun AutomationEditorScreen(
     var timeMinute by remember(existing) { mutableIntStateOf(0) }
     var daysOfWeek by remember(existing) { mutableIntStateOf(127) }
     var appPackageName by remember(existing) { mutableStateOf("") }
+    var batteryThreshold by remember(existing) { mutableIntStateOf(20) }
     var showError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(existing) {
@@ -104,6 +105,8 @@ fun AutomationEditorScreen(
             TriggerType.TIME -> JSONObject().apply { put("hour", timeHour); put("minute", timeMinute); put("daysOfWeek", daysOfWeek) }.toString()
             TriggerType.APP_OPEN, TriggerType.APP_CLOSE -> JSONObject().apply { put("packageName", appPackageName) }.toString()
             TriggerType.CONTEXT_ACTIVATED -> JSONObject().apply { put("contextId", selectedContextId) }.toString()
+            TriggerType.BATTERY_BELOW, TriggerType.BATTERY_ABOVE -> JSONObject().apply { put("thresholdPercent", batteryThreshold) }.toString()
+            else -> "{}" // Simple triggers with no payload
         }
     }
 
@@ -163,7 +166,26 @@ fun AutomationEditorScreen(
                     Text("Trigger Type", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = NexusSpacing.md))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(NexusSpacing.md), verticalArrangement = Arrangement.spacedBy(NexusSpacing.md)) {
                         TriggerType.entries.forEach { type ->
-                            val label = when (type) { TriggerType.MANUAL -> "Manual"; TriggerType.TIME -> "Time"; TriggerType.APP_OPEN -> "App Open"; TriggerType.APP_CLOSE -> "App Close"; TriggerType.CONTEXT_ACTIVATED -> "Context" }
+                            val label = when (type) {
+                                TriggerType.MANUAL -> "Manual"
+                                TriggerType.TIME -> "Time"
+                                TriggerType.APP_OPEN -> "App Open"
+                                TriggerType.APP_CLOSE -> "App Close"
+                                TriggerType.CONTEXT_ACTIVATED -> "Context"
+                                TriggerType.WIFI_CONNECTED -> "Wi-Fi On"
+                                TriggerType.WIFI_DISCONNECTED -> "Wi-Fi Off"
+                                TriggerType.BLUETOOTH_CONNECTED -> "BT On"
+                                TriggerType.BLUETOOTH_DISCONNECTED -> "BT Off"
+                                TriggerType.CHARGING_STARTED -> "Charging"
+                                TriggerType.CHARGING_STOPPED -> "Unplug"
+                                TriggerType.BATTERY_BELOW -> "Battery Low"
+                                TriggerType.BATTERY_ABOVE -> "Battery High"
+                                TriggerType.DEVICE_BOOT -> "Boot"
+                                TriggerType.SCREEN_ON -> "Screen On"
+                                TriggerType.SCREEN_OFF -> "Screen Off"
+                                TriggerType.DEVICE_IDLE -> "Idle"
+                                TriggerType.DEVICE_ACTIVE -> "Active"
+                            }
                             val selected = type == selectedTrigger
                             GlassSurface(
                                 containerColor = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -219,6 +241,19 @@ fun AutomationEditorScreen(
                                     modifier = Modifier.fillMaxWidth().clickable { selectedContextId = ctx.id }.padding(vertical = NexusSpacing.xxs),
                                 ) { Text(ctx.name, style = MaterialTheme.typography.bodyMedium, color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface) }
                             }
+                        }
+                    }
+                }
+            }
+
+            if (selectedTrigger == TriggerType.BATTERY_BELOW || selectedTrigger == TriggerType.BATTERY_ABOVE) {
+                item {
+                    GlassSurface {
+                        Column {
+                            Text("Battery Threshold", style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.height(NexusSpacing.sm))
+                            OutlinedTextField(value = batteryThreshold.toString(), onValueChange = { it.toIntOrNull()?.let { v -> if (v in 0..100) batteryThreshold = v } }, label = { Text("Percentage") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                            Text("Trigger when battery ${if (selectedTrigger == TriggerType.BATTERY_BELOW) "drops below" else "rises above"} this level", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }

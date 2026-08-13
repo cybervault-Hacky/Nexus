@@ -99,7 +99,26 @@ fun AutomationDetailScreen(
                                 Text(rule.name, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurface)
                                 if (rule.description.isNotBlank()) { Spacer(Modifier.height(NexusSpacing.xs)); Text(rule.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                                 Spacer(Modifier.height(NexusSpacing.md))
-                                val triggerLabel = when (rule.triggerType) { TriggerType.MANUAL -> "Manual"; TriggerType.TIME -> "Time"; TriggerType.APP_OPEN -> "App Open"; TriggerType.APP_CLOSE -> "App Close"; TriggerType.CONTEXT_ACTIVATED -> "Context Activated" }
+                                val triggerLabel = when (rule.triggerType) {
+                                    TriggerType.MANUAL -> "Manual"
+                                    TriggerType.TIME -> "Time"
+                                    TriggerType.APP_OPEN -> "App Open"
+                                    TriggerType.APP_CLOSE -> "App Close"
+                                    TriggerType.CONTEXT_ACTIVATED -> "Context Activated"
+                                    TriggerType.WIFI_CONNECTED -> "Wi-Fi Connected"
+                                    TriggerType.WIFI_DISCONNECTED -> "Wi-Fi Disconnected"
+                                    TriggerType.BLUETOOTH_CONNECTED -> "Bluetooth Connected"
+                                    TriggerType.BLUETOOTH_DISCONNECTED -> "Bluetooth Disconnected"
+                                    TriggerType.CHARGING_STARTED -> "Charging Started"
+                                    TriggerType.CHARGING_STOPPED -> "Charging Stopped"
+                                    TriggerType.BATTERY_BELOW -> "Battery Below"
+                                    TriggerType.BATTERY_ABOVE -> "Battery Above"
+                                    TriggerType.DEVICE_BOOT -> "Device Boot"
+                                    TriggerType.SCREEN_ON -> "Screen On"
+                                    TriggerType.SCREEN_OFF -> "Screen Off"
+                                    TriggerType.DEVICE_IDLE -> "Device Idle"
+                                    TriggerType.DEVICE_ACTIVE -> "Device Active"
+                                }
                                 StatusBadge(text = triggerLabel, backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), textColor = MaterialTheme.colorScheme.primary)
                             }
                         }

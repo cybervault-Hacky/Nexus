@@ -25,6 +25,7 @@ import com.nexus.app.ui.screens.automationEditor.AutomationEditorScreen
 import com.nexus.app.ui.screens.automationHistory.AutomationHistoryScreen
 import com.nexus.app.ui.screens.automations.AutomationScreen
 import com.nexus.app.ui.screens.automations.AutomationViewModel
+import com.nexus.app.ui.screens.environmentSources.EnvironmentSourcesScreen
 import com.nexus.app.ui.screens.capsuleDetail.CapsuleDetailScreen
 import com.nexus.app.ui.screens.capsuleEditor.CapsuleEditorScreen
 import com.nexus.app.ui.screens.capsules.CapsuleViewModel
@@ -185,6 +186,13 @@ fun NexusNavGraph(navController: NavHostController) {
         }
         composable(Screen.AutomationHistory.route) {
             AutomationHistoryScreen(automationViewModel, onNavigateBack = { navController.popBackStack() })
+        }
+        composable(Screen.EnvironmentSources.route) {
+            EnvironmentSourcesScreen(
+                registry = app.eventSourceRegistry,
+                settings = app.automationSettings,
+                onNavigateBack = { navController.popBackStack() },
+            )
         }
     }
 }

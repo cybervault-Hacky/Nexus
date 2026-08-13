@@ -1,7 +1,6 @@
 package com.nexus.app.data.automation
 
 import com.nexus.app.data.action.WorkflowExecutor
-import com.nexus.app.domain.model.NexusAction
 import com.nexus.app.domain.model.automation.AutomationExecution
 import com.nexus.app.domain.model.automation.AutomationRule
 import com.nexus.app.domain.model.automation.ExecutionStatus
@@ -16,9 +15,9 @@ import java.util.UUID
 /**
  * Core automation engine.
  *
- * Receives [TriggerEvent]s, finds matching automations, checks cooldowns,
- * executes workflows via the existing [WorkflowExecutor], and records
- * execution history.
+ * Receives [TriggerEvent]s, finds matching automations via [TriggerMatcher],
+ * checks cooldowns, executes workflows via the existing [WorkflowExecutor],
+ * and records execution history.
  *
  * Thread-safe: uses a Mutex to prevent duplicate concurrent executions
  * of the same automation.
@@ -46,8 +45,7 @@ class TriggerEngine(
     private suspend fun findMatchingRules(event: TriggerEvent): List<AutomationRule> {
         return when (event) {
             is TriggerEvent.Manual -> {
-                val id = event.automationId
-                val rule = automationRepository.getById(id)
+                val rule = automationRepository.getById(event.automationId)
                 if (rule != null && rule.isEnabled) listOf(rule) else emptyList()
             }
             is TriggerEvent.Time -> {
@@ -59,22 +57,11 @@ class TriggerEngine(
                     automationRepository.getEnabledByTriggerType(TriggerType.TIME)
                 }
             }
-            is TriggerEvent.AppOpened -> {
-                automationRepository.getEnabledByTriggerType(TriggerType.APP_OPEN).filter { rule ->
-                    val payload = rule.triggerPayload
-                    payload.contains("\"${event.packageName}\"")
-                }
-            }
-            is TriggerEvent.AppClosed -> {
-                automationRepository.getEnabledByTriggerType(TriggerType.APP_CLOSE).filter { rule ->
-                    val payload = rule.triggerPayload
-                    payload.contains("\"${event.packageName}\"")
-                }
-            }
-            is TriggerEvent.ContextActivated -> {
-                automationRepository.getEnabledByTriggerType(TriggerType.CONTEXT_ACTIVATED).filter { rule ->
-                    rule.contextId == event.contextId
-                }
+            // All other events: use TriggerMatcher against enabled rules of matching type
+            else -> {
+                val targetType = event.toTriggerType()
+                val rules = automationRepository.getEnabledByTriggerType(targetType)
+                rules.filter { TriggerMatcher.matches(event, it) }
             }
         }
     }
@@ -155,10 +142,23 @@ class TriggerEngine(
     }
 }
 
-private fun TriggerEvent.toTriggerType(): TriggerType = when (this) {
+/** Map event to its trigger type for matching and recording. */
+fun TriggerEvent.toTriggerType(): TriggerType = when (this) {
     is TriggerEvent.Manual -> TriggerType.MANUAL
     is TriggerEvent.Time -> TriggerType.TIME
     is TriggerEvent.AppOpened -> TriggerType.APP_OPEN
     is TriggerEvent.AppClosed -> TriggerType.APP_CLOSE
     is TriggerEvent.ContextActivated -> TriggerType.CONTEXT_ACTIVATED
+    is TriggerEvent.WifiConnected -> TriggerType.WIFI_CONNECTED
+    is TriggerEvent.WifiDisconnected -> TriggerType.WIFI_DISCONNECTED
+    is TriggerEvent.BluetoothConnected -> TriggerType.BLUETOOTH_CONNECTED
+    is TriggerEvent.BluetoothDisconnected -> TriggerType.BLUETOOTH_DISCONNECTED
+    is TriggerEvent.ChargingStarted -> TriggerType.CHARGING_STARTED
+    is TriggerEvent.ChargingStopped -> TriggerType.CHARGING_STOPPED
+    is TriggerEvent.BatteryLevelChanged -> TriggerType.BATTERY_BELOW // Both battery types match
+    is TriggerEvent.DeviceBoot -> TriggerType.DEVICE_BOOT
+    is TriggerEvent.ScreenOn -> TriggerType.SCREEN_ON
+    is TriggerEvent.ScreenOff -> TriggerType.SCREEN_OFF
+    is TriggerEvent.DeviceIdle -> TriggerType.DEVICE_IDLE
+    is TriggerEvent.DeviceActive -> TriggerType.DEVICE_ACTIVE
 }

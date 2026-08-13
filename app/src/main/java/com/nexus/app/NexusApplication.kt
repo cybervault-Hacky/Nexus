@@ -9,7 +9,17 @@ import com.nexus.app.data.action.WorkflowExecutor
 import com.nexus.app.data.app.AppLauncher
 import com.nexus.app.data.app.InstalledAppDataSource
 import com.nexus.app.data.automation.AutomationScheduler
+import com.nexus.app.data.automation.AutomationSettingsImpl
+import com.nexus.app.data.automation.EventDeduplicator
 import com.nexus.app.data.automation.TriggerEngine
+import com.nexus.app.data.automation.TriggerEventRouter
+import com.nexus.app.data.environment.battery.BatteryEventSource
+import com.nexus.app.data.environment.bluetooth.BluetoothEventSource
+import com.nexus.app.data.environment.boot.BootEventSource
+import com.nexus.app.data.environment.idle.IdleStateEventSource
+import com.nexus.app.data.environment.power.PowerEventSource
+import com.nexus.app.data.environment.screen.ScreenEventSource
+import com.nexus.app.data.environment.wifi.WifiEventSource
 import com.nexus.app.data.local.NexusDatabase
 import com.nexus.app.data.repository.ActionRepositoryImpl
 import com.nexus.app.data.repository.AutomationRepositoryImpl
@@ -19,6 +29,7 @@ import com.nexus.app.data.repository.ContextRepositoryImpl
 import com.nexus.app.data.repository.InstalledAppRepositoryImpl
 import com.nexus.app.data.restore.CapsuleRestoreEngine
 import com.nexus.app.data.restore.RestorePreviewEngine
+import com.nexus.app.domain.event.EnvironmentEventSourceRegistry
 import com.nexus.app.domain.model.ActionType
 import com.nexus.app.domain.repository.ActionRepository
 import com.nexus.app.domain.repository.AutomationRepository
@@ -26,6 +37,9 @@ import com.nexus.app.domain.repository.CapsuleRepository
 import com.nexus.app.domain.repository.ContextAppRepository
 import com.nexus.app.domain.repository.ContextRepository
 import com.nexus.app.domain.repository.InstalledAppRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class NexusApplication : Application() {
 
@@ -53,6 +67,14 @@ class NexusApplication : Application() {
         private set
     lateinit var automationScheduler: AutomationScheduler
         private set
+    lateinit var eventSourceRegistry: EnvironmentEventSourceRegistry
+        private set
+    lateinit var automationSettings: AutomationSettingsImpl
+        private set
+    lateinit var triggerEventRouter: TriggerEventRouter
+        private set
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -109,5 +131,27 @@ class NexusApplication : Application() {
 
         triggerEngine = TriggerEngine(automationRepository, actionRepository, workflowExecutor)
         automationScheduler = AutomationScheduler(applicationContext)
+
+        // Phase 8: Environment event sources
+        automationSettings = AutomationSettingsImpl(applicationContext)
+        eventSourceRegistry = EnvironmentEventSourceRegistry().apply {
+            register(WifiEventSource(applicationContext))
+            register(BluetoothEventSource(applicationContext))
+            register(PowerEventSource(applicationContext))
+            register(BatteryEventSource(applicationContext))
+            register(BootEventSource(applicationContext))
+            register(ScreenEventSource(applicationContext))
+            register(IdleStateEventSource(applicationContext))
+        }
+        eventSourceRegistry.startEnabled()
+
+        // Start routing environment events to trigger engine
+        triggerEventRouter = TriggerEventRouter(
+            registry = eventSourceRegistry,
+            triggerEngine = triggerEngine,
+            deduplicator = EventDeduplicator(),
+            automationSettings = automationSettings,
+        )
+        triggerEventRouter.startRouting(appScope)
     }
 }

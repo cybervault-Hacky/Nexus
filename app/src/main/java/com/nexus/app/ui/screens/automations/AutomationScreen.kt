@@ -125,6 +125,19 @@ private fun AutomationCard(
         TriggerType.APP_OPEN -> "App Open"
         TriggerType.APP_CLOSE -> "App Close"
         TriggerType.CONTEXT_ACTIVATED -> "Context"
+        TriggerType.WIFI_CONNECTED -> "Wi-Fi"
+        TriggerType.WIFI_DISCONNECTED -> "Wi-Fi Off"
+        TriggerType.BLUETOOTH_CONNECTED -> "BT"
+        TriggerType.BLUETOOTH_DISCONNECTED -> "BT Off"
+        TriggerType.CHARGING_STARTED -> "Charging"
+        TriggerType.CHARGING_STOPPED -> "Unplug"
+        TriggerType.BATTERY_BELOW -> "Battery Low"
+        TriggerType.BATTERY_ABOVE -> "Battery High"
+        TriggerType.DEVICE_BOOT -> "Boot"
+        TriggerType.SCREEN_ON -> "Screen"
+        TriggerType.SCREEN_OFF -> "Screen Off"
+        TriggerType.DEVICE_IDLE -> "Idle"
+        TriggerType.DEVICE_ACTIVE -> "Active"
     }
 
     GlassSurface(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {

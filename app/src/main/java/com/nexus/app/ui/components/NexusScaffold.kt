@@ -34,7 +34,8 @@ fun NexusScaffold() {
         currentRoute.startsWith("capsule_restore") ||
         currentRoute.startsWith("automation_detail") ||
         currentRoute.startsWith("automation_editor") ||
-        currentRoute == Screen.AutomationHistory.route
+        currentRoute == Screen.AutomationHistory.route ||
+        currentRoute == Screen.EnvironmentSources.route
 
     val showBottomBar = currentRoute in topLevelRoutes && !isSubScreen
 
