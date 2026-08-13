@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NEXUS</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_contexts">Contexts</string>
+    <string name="nav_capsules">Capsules</string>
+    <string name="nav_actions">Actions</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home -->
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <string name="home_active_context">Active Context</string>
+    <string name="home_no_active_context">No active context</string>
+    <string name="home_recent_capsules">Recent Capsules</string>
+    <string name="home_quick_actions">Quick Actions</string>
+    <string name="home_open">Open</string>
+
+    <!-- Contexts -->
+    <string name="contexts_title">Contexts</string>
+    <string name="contexts_subtitle">Organize your workflow</string>
+    <string name="contexts_new">New Context</string>
+    <string name="contexts_apps_count">%1$d apps</string>
+    <string name="contexts_actions_count">%1$d actions</string>
+    <string name="contexts_active">Active</string>
+    <string name="contexts_inactive">Inactive</string>
+    <string name="contexts_activate">Activate</string>
+    <string name="contexts_empty_title">No contexts yet</string>
+    <string name="contexts_empty_subtitle">Create your first context to start organizing your workflow.</string>
+
+    <!-- Context Editor -->
+    <string name="editor_create_title">New Context</string>
+    <string name="editor_edit_title">Edit Context</string>
+    <string name="editor_name">Name</string>
+    <string name="editor_name_hint">e.g. Coding, Study, Travel</string>
+    <string name="editor_description">Description</string>
+    <string name="editor_description_hint">Brief description of this context</string>
+    <string name="editor_icon">Icon</string>
+    <string name="editor_color">Accent Color</string>
+    <string name="editor_save">Save</string>
+    <string name="editor_name_empty">Name cannot be empty</string>
+    <string name="editor_name_too_long">Name is too long</string>
+    <string name="editor_desc_too_long">Description is too long</string>
+
+    <!-- Context Detail -->
+    <string name="detail_not_found">Context not found</string>
+    <string name="detail_apps_actions">Apps &amp; Actions</string>
+    <string name="detail_apps_actions_placeholder">Apps and actions will be configured in Phase 3.</string>
+    <string name="detail_details">Details</string>
+    <string name="detail_actions">Actions</string>
+    <string name="detail_activate">Activate Context</string>
+    <string name="detail_activate_desc">Set this as the active context</string>
+    <string name="detail_deactivate">Deactivate Context</string>
+    <string name="detail_deactivate_desc">Remove this as the active context</string>
+    <string name="detail_edit">Edit Context</string>
+    <string name="detail_edit_desc">Modify name, description, icon, and color</string>
+    <string name="detail_duplicate">Duplicate Context</string>
+    <string name="detail_duplicate_desc">Create a copy of this context</string>
+    <string name="detail_delete">Delete Context</string>
+    <string name="detail_delete_desc">Permanently remove this context</string>
+    <string name="detail_delete_confirm_title">Delete context?</string>
+    <string name="detail_delete_confirm_text">\"%1$s\" and its configuration will be permanently deleted. This cannot be undone.</string>
+
+    <!-- Capsules -->
+    <string name="capsules_title">Capsules</string>
+    <string name="capsules_subtitle">Saved workspace states</string>
+    <string name="capsules_new">New Capsule</string>
+    <string name="capsules_items_count">%1$d items</string>
+    <string name="capsules_last_used">Last used %1$s</string>
+    <string name="capsules_restore">Restore</string>
+    <string name="capsules_empty_title">No capsules yet</string>
+    <string name="capsules_empty_subtitle">Capture a context snapshot to create your first capsule.</string>
+    <string name="capsule_restore">Restore capsule</string>
+    <string name="capsule_capture">Save as Capsule</string>
+    <string name="capsule_capture_desc">Capture this context as a reusable snapshot</string>
+
+    <!-- Quick Actions -->
+    <string name="actions_title">Quick Actions</string>
+    <string name="actions_subtitle">Instant commands</string>
+    <string name="actions_new_context">New Context</string>
+    <string name="actions_new_capsule">New Capsule</string>
+    <string name="actions_search">Search</string>
+    <string name="actions_run">Run Action</string>
+    <string name="actions_coming_soon">Action Engine launching in Phase 4</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_dynamic_color">Dynamic Color</string>
+    <string name="settings_dynamic_color_desc">Use Material You colors</string>
+    <string name="settings_animations">Animations</string>
+    <string name="settings_animations_desc">Enable UI animations</string>
+    <string name="settings_behavior">Behavior</string>
+    <string name="settings_default_screen">Default Screen</string>
+    <string name="settings_confirm_actions">Confirm Actions</string>
+    <string name="settings_confirm_actions_desc">Ask before executing actions</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_licenses">Licenses</string>
+    <string name="settings_open_source">Open-source information</string>
+
+    <!-- App Picker -->
+    <string name="picker_title">Add Apps</string>
+    <string name="picker_search_hint">Search apps…</string>
+    <string name="picker_confirm">Confirm selection</string>
+    <string name="picker_selected_count">%1$d selected</string>
+    <string name="picker_no_apps">No apps found</string>
+    <string name="picker_no_matches">No matching apps</string>
+    <string name="picker_app_selected">%1$s selected</string>
+    <string name="picker_app_not_selected">%1$s not selected</string>
+
+    <!-- Context Detail - Apps -->
+    <string name="detail_apps">Apps</string>
+    <string name="detail_no_apps">No apps configured yet. Add apps to this context.</string>
+    <string name="detail_add_apps">Add Apps</string>
+    <string name="detail_remove_app">Remove %1$s</string>
+    <string name="detail_app_unavailable">App unavailable</string>
+
+    <!-- Context Detail - Actions -->
+    <string name="detail_actions_section">Actions</string>
+    <string name="detail_no_actions">No actions configured yet. Add actions to automate this context.</string>
+    <string name="detail_add_action">Add Action</string>
+    <string name="detail_run_workflow">Run Workflow</string>
+    <string name="action_run">Run %1$s</string>
+
+    <!-- Action Editor -->
+    <string name="action_editor_create_title">New Action</string>
+    <string name="action_editor_edit_title">Edit Action</string>
+    <string name="action_type_open_app">Open App</string>
+    <string name="action_type_open_url">Open URL</string>
+    <string name="action_type_delay">Delay</string>
+    <string name="action_config_package">Package name</string>
+    <string name="action_config_url">URL</string>
+    <string name="action_config_duration">Duration (milliseconds)</string>
+
+    <!-- Workflow Progress -->
+    <string name="workflow_running">Running workflow</string>
+    <string name="workflow_completed">Workflow completed</string>
+    <string name="workflow_failed">Workflow stopped</string>
+    <string name="workflow_cancelled">Workflow cancelled</string>
+    <string name="workflow_cancel">Cancel</string>
+    <string name="workflow_dismiss">Dismiss</string>
+
+    <!-- Accessibility -->
+    <string name="cd_nexus_logo">NEXUS logo</string>
+    <string name="cd_context_card">Context card for %1$s</string>
+    <string name="cd_capsule_card">Capsule card for %1$s</string>
+    <string name="cd_quick_action">Quick action: %1$s</string>
+    <string name="cd_settings_option">Settings option: %1$s</string>
+    <string name="cd_navigate_tab">Navigate to %1$s tab</string>
+</resources>

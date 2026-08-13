@@ -1,0 +1,29 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Signing keystores
+*.jks
+*.keystore
+keystore.properties
+
+# Environment
+.env
+.env.local
