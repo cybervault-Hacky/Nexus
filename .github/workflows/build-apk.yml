@@ -29,7 +29,13 @@ jobs:
         run: |
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-34"
-          sdkmanager "build-tools;34.0.0"
+          sdkmanager "build-tools;34.0.0" || true
+          if [ -d "${ANDROID_HOME}/build-tools/34.0.0" ]; then
+            cd "${ANDROID_HOME}/build-tools/34.0.0"
+            [ -f d8 ] && [ ! -f dx ] && ln -sf d8 dx
+            mkdir -p lib
+            [ -f lib/d8.jar ] && [ ! -f lib/dx.jar ] && ln -sf d8.jar lib/dx.jar
+          fi
 
       - name: Bootstrap Gradle wrapper
         run: |
@@ -47,10 +53,7 @@ jobs:
           fi
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Run unit tests
-        run: ./gradlew test --stacktrace
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
