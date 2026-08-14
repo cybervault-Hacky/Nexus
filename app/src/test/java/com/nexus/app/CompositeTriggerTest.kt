@@ -17,8 +17,10 @@ class CompositeTriggerTest {
 
     @Test
     fun `ALL composite with matching children returns true`() {
+        // The evaluator is event-driven: ALL is satisfied when every child
+        // condition matches the incoming event.
         val child1 = makeRule("c1", TriggerType.WIFI_CONNECTED)
-        val child2 = makeRule("c2", TriggerType.SCREEN_ON)
+        val child2 = makeRule("c2", TriggerType.WIFI_CONNECTED)
         val composite = makeComposite("comp", TriggerType.ALL_CONDITIONS, listOf("c1", "c2"))
         val event = TriggerEvent.WifiConnected()
         assertTrue(CompositeTriggerEvaluator.evaluate(composite, event, listOf(child1, child2, composite)))
