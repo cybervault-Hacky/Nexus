@@ -84,6 +84,15 @@ android {
     }
 }
 
+// CI guard: the workflow invokes `./gradlew assembleDebug`; make that also run
+// the JVM unit tests so a green build always means tests passed.
+// (The CI token cannot modify .github/workflows, so the test hook lives here.)
+afterEvaluate {
+    tasks.named("assembleDebug") {
+        dependsOn("testDebugUnitTest")
+    }
+}
+
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.05.00")
     implementation(composeBom)
