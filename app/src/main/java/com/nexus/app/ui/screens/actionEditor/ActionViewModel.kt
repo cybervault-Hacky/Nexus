@@ -35,6 +35,18 @@ class ActionViewModel(
     fun observeActionCount(contextId: String) =
         actionRepository.observeActionCount(contextId)
 
+    /** One-shot load of an action by id — result delivered via [onResult]. */
+    fun getById(id: String, onResult: (NexusAction?) -> Unit) {
+        viewModelScope.launch {
+            val action = try {
+                actionRepository.getById(id)
+            } catch (_: Exception) {
+                null
+            }
+            onResult(action)
+        }
+    }
+
     // ── Commands ─────────────────────────────────────────────
 
     fun createAction(

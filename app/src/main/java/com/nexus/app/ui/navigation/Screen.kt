@@ -1,11 +1,13 @@
 package com.nexus.app.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.Home
@@ -109,8 +111,8 @@ sealed class Screen(
     data object Automations : Screen(
         route = "automations",
         label = "Automate",
-        selectedIcon = androidx.compose.material.icons.rounded.AutoAwesome,
-        unselectedIcon = androidx.compose.material.icons.outlined.AutoAwesome,
+        selectedIcon = Icons.Rounded.AutoAwesome,
+        unselectedIcon = Icons.Outlined.AutoAwesome,
     )
 
     /** Automation detail — argument: automationId */

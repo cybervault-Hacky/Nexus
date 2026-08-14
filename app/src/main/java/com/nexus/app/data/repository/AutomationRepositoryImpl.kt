@@ -7,8 +7,11 @@ import com.nexus.app.data.local.toEntity
 import com.nexus.app.domain.model.automation.AutomationExecution
 import com.nexus.app.domain.model.automation.AutomationRule
 import com.nexus.app.domain.model.automation.TriggerType
+import com.nexus.app.domain.model.smart.AutomationHealth
+import com.nexus.app.domain.model.smart.AutomationPriority
 import com.nexus.app.domain.repository.AutomationRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class AutomationRepositoryImpl(
@@ -94,10 +97,6 @@ class AutomationRepositoryImpl(
         automationDao.getAllRules().map { it.toDomain() }
 
     override suspend fun getAllExecutions(): List<AutomationExecution> =
-        executionDao.observeRecent(1000).map { list -> list.map { it.toDomain() } }.let { flow ->
-            // One-shot read via first emission
-            var result = emptyList<AutomationExecution>()
-            flow.collect { result = it; return@collect }
-            result
-        }
+        // One-shot read via first emission
+        executionDao.observeRecent(1000).map { list -> list.map { it.toDomain() } }.first()
 }

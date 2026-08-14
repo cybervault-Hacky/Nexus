@@ -64,7 +64,7 @@ fun QuickActionCard(
             contentPadding = NexusSpacing.base,
         ) {
             Icon(
-                imageVector = action.icon,
+                imageVector = action.icon(),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp),
