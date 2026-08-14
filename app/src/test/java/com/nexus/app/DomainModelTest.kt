@@ -89,17 +89,31 @@ class DomainModelTest {
     @Test
     fun `NexusCapsule holds correct data`() {
         val cap = NexusCapsule(
-            id = "cap1", name = "My Capsule", description = "Desc",
-            itemCount = 5, lastUsedTimestamp = 1000L,
+            id = "cap1", sourceContextId = "ctx1", name = "My Capsule", description = "Desc",
+            appSnapshots = listOf(
+                com.nexus.app.domain.model.AppSnapshot(packageName = "com.example.a", appName = "A"),
+                com.nexus.app.domain.model.AppSnapshot(packageName = "com.example.b", appName = "B"),
+            ),
+            actionSnapshots = listOf(
+                com.nexus.app.domain.model.ActionSnapshot(
+                    name = "Open A",
+                    description = "",
+                    type = com.nexus.app.domain.model.ActionType.OPEN_APP,
+                    payload = "{\"packageName\":\"com.example.a\"}",
+                    position = 0,
+                ),
+            ),
         )
         assertEquals("cap1", cap.id)
-        assertEquals(5, cap.itemCount)
+        assertEquals("ctx1", cap.sourceContextId)
+        assertEquals(2, cap.appCount)
+        assertEquals(1, cap.actionCount)
     }
 
     @Test
     fun `NexusCapsule accentColor has default value`() {
         val cap = NexusCapsule(
-            id = "x", name = "X", description = "", itemCount = 1, lastUsedTimestamp = 0,
+            id = "x", sourceContextId = "ctx", name = "X", description = "",
         )
         assertEquals(0xFF8B5CF6, cap.accentColor)
     }
