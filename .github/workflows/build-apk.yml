@@ -29,11 +29,14 @@ jobs:
         run: |
           sdkmanager "platform-tools"
           sdkmanager "platforms;android-34"
-          sdkmanager "build-tools;34.0.0"
+          sdkmanager "build-tools;34.0.0" || true
+          if [ -d "${ANDROID_HOME}/build-tools/34.0.0" ]; then
+            cd "${ANDROID_HOME}/build-tools/34.0.0"
+            [ -f d8 ] && [ ! -f dx ] && ln -sf d8 dx
+            mkdir -p lib
+            [ -f lib/d8.jar ] && [ ! -f lib/dx.jar ] && ln -sf d8.jar lib/dx.jar
+          fi
 
-      # Root cause of the previous CI failure: gradle-wrapper.jar was not in the
-      # repository, so ./gradlew exited immediately (exit code 1) before Gradle
-      # could start. Bootstrap an official Gradle 8.5 wrapper when it is absent.
       - name: Bootstrap Gradle wrapper
         run: |
           set -euo pipefail
@@ -50,14 +53,25 @@ jobs:
           fi
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: nexus-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Upload Gradle reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-reports
+          path: |
+            **/build/reports/**
+            **/build/outputs/logs/**
+          if-no-files-found: ignore
