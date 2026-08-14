@@ -11,8 +11,9 @@ import org.junit.Test
 class EnvironmentEventTest {
 
     @Test
-    fun `TriggerType has 18 values`() {
-        assertEquals(18, TriggerType.entries.size)
+    fun `TriggerType has 28 values`() {
+        // 5 (Phase 7) + 13 (Phase 8) + 10 (Phase 9, incl. composites) = 28
+        assertEquals(28, TriggerType.entries.size)
     }
 
     @Test

@@ -24,8 +24,15 @@ class AutomationModelTest {
     }
 
     @Test
-    fun `TriggerType has five values`() {
-        assertEquals(5, TriggerType.entries.size)
+    fun `TriggerType includes the five Phase 7 values`() {
+        // Phases 8-9 extended TriggerType; the original Phase 7 five must remain.
+        assertTrue(TriggerType.entries.containsAll(listOf(
+            TriggerType.MANUAL,
+            TriggerType.TIME,
+            TriggerType.APP_OPEN,
+            TriggerType.APP_CLOSE,
+            TriggerType.CONTEXT_ACTIVATED,
+        )))
     }
 
     @Test
