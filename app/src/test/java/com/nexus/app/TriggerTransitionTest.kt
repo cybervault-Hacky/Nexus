@@ -20,8 +20,8 @@ class TriggerTransitionTest {
         val payload = JSONObject().apply { put("thresholdPercent", 20) }.toString()
         val rule = makeRule(TriggerType.BATTERY_BELOW, payload = payload, id = "bat1")
 
-        // 25% → 19%: crossing down — should trigger
-        assertTrue(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(25), rule))
+        // 25% → 19%: crossing down — only the crossing event triggers
+        assertFalse(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(25), rule))
         assertTrue(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(19), rule))
     }
 
@@ -58,8 +58,8 @@ class TriggerTransitionTest {
         val payload = JSONObject().apply { put("thresholdPercent", 80) }.toString()
         val rule = makeRule(TriggerType.BATTERY_ABOVE, payload = payload, id = "bat4")
 
-        // 75% → 85%: crossing up — should trigger
-        assertTrue(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(75), rule))
+        // 75% → 85%: crossing up — only the crossing event triggers
+        assertFalse(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(75), rule))
         assertTrue(TriggerMatcher.matches(TriggerEvent.BatteryLevelChanged(85), rule))
     }
 

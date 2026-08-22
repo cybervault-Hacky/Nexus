@@ -84,8 +84,17 @@ android {
     }
 }
 
+// CI guard: the workflow invokes `./gradlew assembleDebug`; make that also run
+// the JVM unit tests so a green build always means tests passed.
+// (The CI token cannot modify .github/workflows, so the test hook lives here.)
+afterEvaluate {
+    tasks.named("assembleDebug") {
+        dependsOn("testDebugUnitTest")
+    }
+}
+
 dependencies {
-    val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
+    val composeBom = platform("androidx.compose:compose-bom:2024.05.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
@@ -122,6 +131,9 @@ dependencies {
 
     // Testing
     testImplementation("junit:junit:4.13.2")
+    // Real org.json implementation for local JVM unit tests (the android.jar
+    // stub throws RuntimeException for JSONObject/JSONArray methods).
+    testImplementation("org.json:json:20240303")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

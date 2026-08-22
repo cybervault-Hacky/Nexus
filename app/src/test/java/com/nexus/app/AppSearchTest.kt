@@ -58,8 +58,10 @@ class AppSearchTest {
     @Test
     fun `search by partial name`() {
         val results = searchApps("ro")
-        // Should match "Chrome" (contains "ro") and "Firefox" (contains "ro")
-        assertEquals(2, results.size)
+        // Matches Chrome (name "Chrome" / pkg "com.android.chrome"),
+        // GitHub (pkg "com.github.android") and YouTube (pkg
+        // "com.google.android.youtube") — all contain "ro" via name or package.
+        assertEquals(3, results.size)
     }
 
     @Test

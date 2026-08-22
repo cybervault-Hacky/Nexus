@@ -6,6 +6,7 @@ import com.nexus.app.data.local.ContextEntity
 import com.nexus.app.data.local.ContextDao
 import com.nexus.app.data.local.ContextAppDao
 import com.nexus.app.data.local.ActionDao
+import androidx.room.withTransaction
 import com.nexus.app.data.local.NexusDatabase
 import com.nexus.app.domain.model.ActionPayload
 import com.nexus.app.domain.model.ActionType
@@ -40,7 +41,7 @@ class CapsuleRestoreEngine(
         val errors = mutableListOf<String>()
 
         return try {
-            database.runInTransaction<RestoreResult> {
+            database.withTransaction {
                 val contextId = UUID.randomUUID().toString()
                 val now = System.currentTimeMillis()
                 val snapshot = capsule.contextSnapshot
@@ -171,13 +172,13 @@ class CapsuleRestoreEngine(
         val errors = mutableListOf<String>()
 
         return try {
-            database.runInTransaction<RestoreResult> {
+            database.withTransaction {
                 val now = System.currentTimeMillis()
                 val snapshot = capsule.contextSnapshot
 
                 // 1. Verify target exists
                 val existingContext = contextDao.getById(targetContextId)
-                    ?: return@runInTransaction RestoreResult(
+                    ?: return@withTransaction RestoreResult(
                         status = RestoreStatus.FAILED,
                         contextId = null,
                         appsRestored = 0, appsSkipped = 0,

@@ -17,6 +17,7 @@ import com.nexus.app.domain.model.ActionType
 import com.nexus.app.domain.model.AppSnapshot
 import com.nexus.app.domain.model.ContextSnapshot
 import com.nexus.app.domain.model.NexusCapsule
+import androidx.room.withTransaction
 import com.nexus.app.domain.repository.CapsuleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -65,8 +66,8 @@ class CapsuleRepositoryImpl(
 
     override suspend fun captureFromContext(contextId: String, name: String, description: String): String {
         // Use a Room transaction for atomicity — no partial capsules
-        return database.runInTransaction<String> {
-            val context = contextDao.getById(contextId) ?: return@runInTransaction ""
+        return database.withTransaction {
+            val context = contextDao.getById(contextId) ?: return@withTransaction ""
             val now = System.currentTimeMillis()
             val capsuleId = UUID.randomUUID().toString()
 

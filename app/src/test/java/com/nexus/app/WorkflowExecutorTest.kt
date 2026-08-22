@@ -7,6 +7,7 @@ import com.nexus.app.domain.model.ActionResult
 import com.nexus.app.domain.model.ActionType
 import com.nexus.app.domain.model.NexusAction
 import com.nexus.app.domain.model.WorkflowState
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -141,7 +142,7 @@ class WorkflowExecutorTest {
         )
 
         // Start and cancel
-        kotlinx.coroutines.launch {
+        launch {
             kotlinx.coroutines.delay(100)
             workflowExecutor.cancel()
         }

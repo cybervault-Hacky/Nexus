@@ -44,6 +44,14 @@ class EventDeduplicator(
         is TriggerEvent.ScreenOff -> "screen_off"
         is TriggerEvent.DeviceIdle -> "idle"
         is TriggerEvent.DeviceActive -> "active"
+        is TriggerEvent.NfcTagDetected -> "nfc_on_${event.tagId}"
+        is TriggerEvent.NfcTagRemoved -> "nfc_off_${event.tagId}"
+        is TriggerEvent.GeofenceEntered -> "geo_in_${event.geofenceId}"
+        is TriggerEvent.GeofenceExited -> "geo_out_${event.geofenceId}"
+        is TriggerEvent.CalendarEventStarted -> "cal_start_${event.eventId}"
+        is TriggerEvent.CalendarEventEnded -> "cal_end_${event.eventId}"
+        is TriggerEvent.NotificationPosted -> "notif_on_${event.packageName}_${event.notificationKey}"
+        is TriggerEvent.NotificationRemoved -> "notif_off_${event.packageName}_${event.notificationKey}"
     }
 
     private fun pruneOld(now: Long) {
