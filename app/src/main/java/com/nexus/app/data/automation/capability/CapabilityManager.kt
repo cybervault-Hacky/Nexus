@@ -1,9 +1,12 @@
 package com.nexus.app.data.automation.capability
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 
 /**
  * Centralized capability checker for NEXUS features.
@@ -12,10 +15,35 @@ import android.provider.Settings
 class CapabilityManager(private val context: Context) {
 
     fun checkNfc(): CapabilityState {
-        val adapter = NfcAdapter.getDefaultAdapter(context)
-            ?: return CapabilityState.UNSUPPORTED
-        return if (adapter.isEnabled) CapabilityState.SUPPORTED
-        else CapabilityState.DISABLED
+        if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_NFC)) {
+            return CapabilityState.UNSUPPORTED
+        }
+        val adapter = try {
+            NfcAdapter.getDefaultAdapter(context)
+        } catch (_: SecurityException) {
+            return CapabilityState.PERMISSION_REQUIRED
+        } catch (_: UnsupportedOperationException) {
+            return CapabilityState.UNSUPPORTED
+        } ?: return CapabilityState.UNSUPPORTED
+
+        return try {
+            if (adapter.isEnabled) CapabilityState.SUPPORTED else CapabilityState.DISABLED
+        } catch (_: SecurityException) {
+            CapabilityState.PERMISSION_REQUIRED
+        }
+    }
+
+    fun checkBluetooth(): CapabilityState {
+        if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+            return CapabilityState.UNSUPPORTED
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            return CapabilityState.PERMISSION_REQUIRED
+        }
+        return CapabilityState.SUPPORTED
     }
 
     fun checkLocation(): CapabilityState {
