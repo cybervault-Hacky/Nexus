@@ -1,6 +1,7 @@
 package com.nexus.app.data.environment.nfc
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import com.nexus.app.domain.event.EnvironmentEventSource
 import com.nexus.app.domain.model.automation.TriggerEvent
@@ -16,11 +17,27 @@ class NfcEventSource(private val context: Context) : EnvironmentEventSource {
     override val sourceId = "nfc"
     override val displayName = "NFC"
 
-    fun isNfcAvailable(): Boolean = NfcAdapter.getDefaultAdapter(context) != null
-    fun isNfcEnabled(): Boolean = NfcAdapter.getDefaultAdapter(context)?.isEnabled == true
+    private fun adapterOrNull(): NfcAdapter? {
+        if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_NFC)) return null
+        return try {
+            NfcAdapter.getDefaultAdapter(context)
+        } catch (_: SecurityException) {
+            null
+        } catch (_: UnsupportedOperationException) {
+            null
+        }
+    }
+
+    fun isNfcAvailable(): Boolean = adapterOrNull() != null
+
+    fun isNfcEnabled(): Boolean = try {
+        adapterOrNull()?.isEnabled == true
+    } catch (_: SecurityException) {
+        false
+    }
 
     override fun isSupported() = isNfcAvailable()
-    override fun start() { }
-    override fun stop() { }
+    override fun start() = Unit
+    override fun stop() = Unit
     override fun events(): Flow<TriggerEvent> = emptyFlow() // Events dispatched via Activity
 }

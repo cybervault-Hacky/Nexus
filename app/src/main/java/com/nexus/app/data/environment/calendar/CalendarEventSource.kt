@@ -1,8 +1,11 @@
 package com.nexus.app.data.environment.calendar
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.provider.CalendarContract
+import androidx.core.content.ContextCompat
 import com.nexus.app.domain.event.EnvironmentEventSource
 import com.nexus.app.domain.model.automation.TriggerEvent
 import kotlinx.coroutines.delay
@@ -19,17 +22,11 @@ class CalendarEventSource(private val context: Context) : EnvironmentEventSource
     override val displayName = "Calendar"
     private var running = false
 
-    override fun isSupported(): Boolean = true // Always supported if permission granted
+    override fun isSupported(): Boolean = hasPermission()
 
-    fun hasPermission(): Boolean {
-        return try {
-            context.contentResolver.query(
-                CalendarContract.Calendars.CONTENT_URI,
-                arrayOf(CalendarContract.Calendars._ID),
-                null, null, null
-            )?.use { true } ?: false
-        } catch (_: SecurityException) { false }
-    }
+    fun hasPermission(): Boolean =
+        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) ==
+            PackageManager.PERMISSION_GRANTED
 
     override fun start() { running = true }
     override fun stop() { running = false }

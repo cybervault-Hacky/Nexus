@@ -16,6 +16,8 @@ import com.nexus.app.data.automation.EventDeduplicator
 import com.nexus.app.data.automation.TriggerEngine
 import com.nexus.app.data.automation.TriggerEventRouter
 import com.nexus.app.data.automation.capability.CapabilityManager
+import com.nexus.app.data.automation.health.AutomationHealthEngine
+import com.nexus.app.data.automation.safety.AutomationSafetyEngine
 import com.nexus.app.data.environment.battery.BatteryEventSource
 import com.nexus.app.data.environment.bluetooth.BluetoothEventSource
 import com.nexus.app.data.environment.boot.BootEventSource
@@ -74,8 +76,8 @@ class NexusApplication : Application() {
     lateinit var geofenceRepository: GeofenceRepositoryImpl; private set
     lateinit var automationSimulator: AutomationSimulator; private set
     // Phase 10 engines
-    lateinit var healthEngine: com.nexus.app.data.automation.health.AutomationHealthEngine; private set
-    lateinit var safetyEngine: com.nexus.app.data.automation.safety.AutomationSafetyEngine; private set
+    lateinit var healthEngine: AutomationHealthEngine; private set
+    lateinit var safetyEngine: AutomationSafetyEngine; private set
     lateinit var nfcEventSource: NfcEventSource; private set
     lateinit var calendarEventSource: CalendarEventSource; private set
     lateinit var notificationEventSource: NotificationEventSource; private set
@@ -131,6 +133,8 @@ class NexusApplication : Application() {
         eventSourceRegistry.startEnabled()
 
         automationSimulator = AutomationSimulator(triggerEngine, automationRepository)
+        healthEngine = AutomationHealthEngine
+        safetyEngine = AutomationSafetyEngine
 
         triggerEventRouter = TriggerEventRouter(eventSourceRegistry, triggerEngine, EventDeduplicator(), automationSettings)
         triggerEventRouter.startRouting(appScope)
